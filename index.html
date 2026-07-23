@@ -679,6 +679,32 @@
       font-size: 14px; color: #555; line-height: 1.6;
       padding-top: 20px; border-top: 1px solid #f0f0f0; margin-top: 8px;
     }
+    .variant-chip {
+      display: flex; flex-direction: column; align-items: flex-start;
+      height: auto !important; padding: 8px 14px !important;
+      min-width: 80px; text-align: left;
+    }
+    .variant-chip.unavailable { border-color: #eee !important; opacity: .5; cursor: not-allowed; }
+    .vc-name { font-size: 13px; font-weight: 600; }
+    .vc-price { font-size: 11px; color: var(--accent-dark); margin-top: 2px; }
+    .vc-orig  { font-size: 10px; color: #aaa; text-decoration: line-through; }
+    .vc-stock { font-size: 10px; color: #aaa; }
+    .vc-out   { font-size: 10px; color: #ef4444; margin-top: 2px; }
+    .disc-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      background: #e53e3e; color: #fff; border-radius: 4px; padding: 1px 5px;
+      margin-left: 6px; vertical-align: middle; line-height: 1.4;
+    }
+    .price-orig-strike {
+      font-size: 11px; color: #aaa; text-decoration: line-through; margin-right: 4px;
+    }
+    .variant-select-btn {
+      flex: 1; height: 50px; border-radius: 14px; border: none;
+      background: #FBBC05; color: #000; font-size: 15px; font-weight: 700;
+      box-shadow: 0 4px 14px rgba(251,188,5,.35); cursor: pointer;
+      transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .variant-select-btn:hover { background: #e6ac00; }
     .detail-qty-wrap {
       display: flex; align-items: center;
       border: 2px solid #e8e8e8; border-radius: 12px; overflow: hidden;
@@ -778,6 +804,8 @@ const HDR = { 'Content-Type': 'application/json', 'X-Storefront-Key': STOREFRONT
 const ACCENT = '#E8A020', AD = '#C8880A'
 
 const som   = n => { const v = Math.round(+n||0); return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' so\'m' }
+const PM_LABELS = { cash:'Naqd', card:'Karta', transfer:"O'tkazma", credit:'Nasiya', mixed:'Aralash', click:'Click', payme:'Payme', uzum:'Uzum', humo:'Humo', uzcard:'UzCard', installment:"Bo'lib to'lash", exchange_credit:'Ayirboshlash' }
+const pmLabel = m => PM_LABELS[m] || (m || '—')
 const media = u => !u ? '' : u.startsWith('http') ? u : API_URL.replace(/\/api\/?$/,'') + u
 const api   = async (p,o={}) => { const r=await fetch(API_URL+p,{...o,headers:HDR}); if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error||'Xatolik'); return r.json() }
 
@@ -809,25 +837,43 @@ function magicOrb(fromEl, toEl) {
 }
 
 // ── ProductDetail ─────────────────────────────────────────────────────
-function ProductDetail({ product, onClose, onAdd, cart }) {
+function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
   const p = product
-  const _firstAvail = p.stock_type === 'tracked'
-    ? (p.units.find(u => Math.floor(p.stock / (u.multiplier||1)) > 0) || p.units[0])
-    : p.units[0]
+  const hasVariants = !!(p.has_variants && p.variants?.length)
+
+  const _firstInStock = hasVariants
+    ? (p.variants.find(v => v.in_stock) || p.variants[0])
+    : null
+  const [variantId, setVariantId] = useState(_firstInStock?.id ?? null)
+
+  const _firstAvail = !hasVariants && p.stock_type === 'tracked'
+    ? (p.units?.find(u => Math.floor(p.stock / (u.multiplier||1)) > 0) || p.units?.[0])
+    : p.units?.[0]
   const [unitId, setUnitId] = useState(_firstAvail?.unit_id ?? null)
   const [qty,    setQty]    = useState(1)
   const [added,  setAdded]  = useState(false)
   const addRef = useRef(null)
 
-  const unit   = p.units.find(u => u.unit_id === unitId) || p.units[0]
+  const selVariant = hasVariants ? (p.variants.find(v => v.id === variantId) || p.variants[0]) : null
+  const unit = !hasVariants ? (p.units?.find(u => u.unit_id === unitId) || p.units?.[0]) : null
+
+  const displayPrice    = hasVariants ? (selVariant?.price ?? 0) : (unit?.price ?? 0)
+  const displayOrigPrice = hasVariants ? (selVariant?.original_price ?? null) : (unit?.original_price ?? null)
   const mult   = unit?.multiplier || 1
-  const maxQty = p.stock_type === 'tracked' ? Math.floor(p.stock / mult) : Infinity
-  const inCart = cart.find(x => x.key === p.id+'_'+(unit?.unit_id??'base'))?.qty || 0
+  const maxQty = hasVariants
+    ? (selVariant?.in_stock ? (selVariant.stock != null ? Math.floor(selVariant.stock) : Infinity) : 0)
+    : (p.stock_type === 'tracked' ? Math.floor(p.stock / mult) : Infinity)
+  const cartKey = hasVariants ? `${p.id}_v${variantId}` : `${p.id}_${unit?.unit_id??'base'}`
+  const inCart = cart.find(x => x.key === cartKey)?.qty || 0
   const out    = maxQty <= 0
 
   const handleAdd = () => {
     if (out || added) return
-    for (let i = 0; i < qty; i++) onAdd(p, unit, addRef.current)
+    if (hasVariants) {
+      onAddVariant(p, selVariant, qty, addRef.current)
+    } else {
+      for (let i = 0; i < qty; i++) onAdd(p, unit, addRef.current)
+    }
     setAdded(true)
     setTimeout(() => setAdded(false), 1400)
   }
@@ -858,10 +904,30 @@ function ProductDetail({ product, onClose, onAdd, cart }) {
         <div className="detail-info-side">
           ${p.category_name && html`<div className="detail-cat">${p.category_name}</div>`}
           <h1 className="detail-name">${p.name}</h1>
-          <div className="detail-price">${som(unit?.price)}</div>
+          <div className="detail-price">
+            ${displayOrigPrice && html`<span className="price-orig-strike">${som(displayOrigPrice)}</span>`}
+            ${som(displayPrice)}
+            ${p.discount_percent > 0 && html`<span className="disc-badge">−${Math.round(p.discount_percent)}%</span>`}
+          </div>
 
-          <!-- Unit chips -->
-          ${p.units.length > 1 && html`
+          <!-- Variant picker -->
+          ${hasVariants && html`
+            <div className="detail-unit-label">Variant tanlang</div>
+            <div className="detail-unit-select">
+              ${p.variants.map(v => html`
+                <button key=${v.id}
+                  className=${'detail-unit-chip variant-chip'+(variantId===v.id?' active':'')+(v.in_stock?'':' unavailable')}
+                  onClick=${()=>{ if(v.in_stock){setVariantId(v.id);setQty(1)} }}>
+                  <span className="vc-name">${v.name}</span>
+                  ${v.original_price != null && html`<span className="vc-orig">${som(v.original_price)}</span>`}
+                  <span className="vc-price">${som(v.price)}</span>
+                  ${v.stock!=null ? html`<span className="vc-stock">${Math.floor(v.stock)} ta</span>` : null}
+                  ${!v.in_stock ? html`<span className="vc-out">Tugadi</span>` : null}
+                </button>`)}
+            </div>`}
+
+          <!-- Unit chips (non-variant) -->
+          ${!hasVariants && p.units?.length > 1 && html`
             <div className="detail-unit-label">Birlik tanlang</div>
             <div className="detail-unit-select">
               ${p.units.map(u => html`
@@ -873,7 +939,11 @@ function ProductDetail({ product, onClose, onAdd, cart }) {
             </div>`}
 
           <!-- Stock -->
-          ${p.stock_type === 'tracked' && html`
+          ${hasVariants && !out && selVariant?.stock != null && html`
+            <div className="detail-stock ok">✓ Stokda: ${Math.floor(selVariant.stock)} ta</div>`}
+          ${hasVariants && out && html`
+            <div className="detail-stock out">❌ Stokda yo'q</div>`}
+          ${!hasVariants && p.stock_type === 'tracked' && html`
             <div className=${'detail-stock'+(out?' out':' ok')}>
               ${out ? '❌ Stokda yo\'q' : '✓ Stokda: '+maxQty+' '+(unit?.unit_name||'dona')}
             </div>`}
@@ -972,22 +1042,34 @@ function BottomNav({ active, count, cartIconRef, onHome, onSearch, onCart, onDra
 
 // ── ProductItem ────────────────────────────────────────────────────────
 function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
-  const _firstAvail = p.stock_type === 'tracked'
-    ? (p.units.find(u => Math.floor(p.stock / (u.multiplier||1)) > 0) || p.units[0])
-    : p.units[0]
+  const hasVariants = !!(p.has_variants && p.variants?.length)
+
+  const _firstAvail = !hasVariants && p.stock_type === 'tracked'
+    ? (p.units?.find(u => Math.floor(p.stock / (u.multiplier||1)) > 0) || p.units?.[0])
+    : p.units?.[0]
   const [unitId, setUnitId] = useState(_firstAvail?.unit_id ?? null)
   const [qty, setQty]       = useState(1)
   const [added, setAdded]   = useState(false)
   const addBtnRef = useRef(null)
-  const unit   = p.units.find(u => u.unit_id === unitId) || p.units[0]
+
+  const unit   = !hasVariants ? (p.units?.find(u => u.unit_id === unitId) || p.units?.[0]) : null
   const mult   = unit?.multiplier || 1
-  const maxQty = p.stock_type === 'tracked' ? Math.floor(p.stock / mult) : Infinity
-  const inCart = cart.find(x => x.key === p.id+'_'+(unit?.unit_id??'base'))?.qty || 0
-  const out    = maxQty <= 0
+  const maxQty = hasVariants
+    ? (p.in_stock ? 1 : 0)
+    : (p.stock_type === 'tracked' ? Math.floor(p.stock / mult) : Infinity)
+  const inCart = !hasVariants ? (cart.find(x => x.key === p.id+'_'+(unit?.unit_id??'base'))?.qty || 0) : 0
+  const out    = hasVariants ? !p.in_stock : maxQty <= 0
+
+  const displayPrice = hasVariants
+    ? (p.variants[0]?.price ?? 0)
+    : (unit?.price ?? 0)
+  const displayOrigPrice = hasVariants
+    ? (p.variants[0]?.original_price ?? null)
+    : (unit?.original_price ?? null)
 
   const handleAdd = (e) => {
     e.stopPropagation()
-    if (out || added) return
+    if (out || added || hasVariants) return
     for (let i = 0; i < qty; i++) onAdd(p, unit, addBtnRef.current)
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
@@ -1008,15 +1090,21 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
       <div className="product-name clamp2">${p.name}</div>
 
       <!-- Meta: stock info -->
-      ${p.stock_type === 'tracked' && !out && html`
+      ${!hasVariants && p.stock_type === 'tracked' && !out && html`
         <div className="product-meta">${maxQty} ${unit?.unit_name||'dona'} mavjud</div>`}
       ${out && html`<div className="product-meta" style=${{color:'#e53e3e'}}>Sotib bo'lindi</div>`}
+      ${hasVariants && !out && html`
+        <div className="product-meta">${p.variants.filter(v=>v.in_stock).length} variant mavjud</div>`}
 
       <!-- Price -->
-      <div className="product-price">${som(unit?.price)}</div>
+      <div className="product-price">
+        ${displayOrigPrice != null && html`<span className="price-orig-strike">${hasVariants ? 'dan '+som(displayOrigPrice) : som(displayOrigPrice)}</span>`}
+        ${hasVariants ? 'dan '+som(displayPrice) : som(displayPrice)}
+        ${p.discount_percent > 0 && html`<span className="disc-badge">−${Math.round(p.discount_percent)}%</span>`}
+      </div>
 
-      <!-- Unit selector -->
-      ${p.units.length > 1 && html`
+      <!-- Unit selector (non-variant only) -->
+      ${!hasVariants && p.units?.length > 1 && html`
         <div className="unit-row" onClick=${e=>e.stopPropagation()}>
           <span className="unit-label">Birlik:</span>
           <div className="unit-select-wrap">
@@ -1029,14 +1117,20 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
 
       <!-- Controls -->
       <div className="controls-row" onClick=${e=>e.stopPropagation()}>
-        <div className="qty-wrap">
-          <button className="qty-btn" onClick=${e=>{e.stopPropagation();setQty(q=>Math.max(1,q-1))}}>−</button>
-          <span className="qty-num">${qty}</span>
-          <button className="qty-btn" onClick=${e=>{e.stopPropagation();setQty(q=>maxQty===Infinity?q+1:Math.min(q+1,maxQty-inCart))}}>+</button>
-        </div>
-        <button ref=${addBtnRef} className=${'add-btn'+(out?' btn-tugadi':added?' btn-added':'')} onClick=${handleAdd} disabled=${out}>
-          ${out ? 'Tugadi' : added ? '✓' : 'Savatga'}
-        </button>
+        ${hasVariants
+          ? html`<button className="add-btn" style=${{flex:1}} onClick=${e=>{e.stopPropagation();onDetail(p)}}
+              disabled=${out}>
+              ${out ? 'Tugadi' : 'Tanlang'}
+            </button>`
+          : html`
+            <div className="qty-wrap">
+              <button className="qty-btn" onClick=${e=>{e.stopPropagation();setQty(q=>Math.max(1,q-1))}}>−</button>
+              <span className="qty-num">${qty}</span>
+              <button className="qty-btn" onClick=${e=>{e.stopPropagation();setQty(q=>maxQty===Infinity?q+1:Math.min(q+1,maxQty-inCart))}}>+</button>
+            </div>
+            <button ref=${addBtnRef} className=${'add-btn'+(out?' btn-tugadi':added?' btn-added':'')} onClick=${handleAdd} disabled=${out}>
+              ${out ? 'Tugadi' : added ? '✓' : 'Savatga'}
+            </button>`}
       </div>
     </div>`
 }
@@ -1089,7 +1183,7 @@ function CartSheet({ open, onClose, items, setQty, remove, total, onCheckout }) 
                       : html`<${IBox} s=${28}/>`}
                   </div>
                   <div className="cart-info-new">
-                    <div className="cart-name-new clamp2">${it.name}</div>
+                    <div className="cart-name-new clamp2">${it.name}${it.variant_name ? ' · '+it.variant_name : ''}</div>
                     <div className="cart-price-new">${som(it.price * it.qty)}</div>
                     <div className="cart-unit-new">${som(it.price)} × ${it.qty} ${it.unit_name}</div>
                   </div>
@@ -1312,26 +1406,42 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
                     const label = s.receipt_number || ('Xarid #'+(i+1))
                     const dateStr = fmt(s.created_at)
                     const total = +(s.total)||0
+                    const debt = +(s.debt)||0
+                    const paid = +(s.paid)||0
+                    const breakdown = s.payment_breakdown||[]
                     const expanded = openSale===i
                     return html`
                       <div key=${i} style=${{border:'1.5px solid #eee',borderRadius:14,overflow:'hidden',background:'#fff',flexShrink:0}}>
                         <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px',cursor:'pointer',background:'#fff',minHeight:52}} onClick=${()=>setOpenSale(expanded?null:i)}>
                           <div style=${{flex:1,minWidth:0}}>
                             <div style=${{fontWeight:700,fontSize:13,color:'#111',marginBottom:2}}>${label}</div>
-                            <div style=${{fontSize:11,color:'#999'}}>${dateStr}</div>
+                            <div style=${{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                              <span style=${{fontSize:11,color:'#999'}}>${dateStr}</span>
+                              <span style=${{fontSize:10,color:'#475569',background:'#f1f5f9',padding:'1px 6px',borderRadius:5,fontWeight:600}}>${pmLabel(s.payment_method)}</span>
+                            </div>
                           </div>
                           <div style=${{display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
-                            <span style=${{fontWeight:800,fontSize:14,color:'#111',whiteSpace:'nowrap'}}>${som(total)}</span>
+                            <div style=${{textAlign:'right'}}>
+                              <div style=${{fontWeight:800,fontSize:14,color:'#111',whiteSpace:'nowrap'}}>${som(total)}</div>
+                              ${debt>0 && html`<div style=${{fontSize:10,color:'#ef4444',fontWeight:700,whiteSpace:'nowrap'}}>Qarz: ${som(debt)}</div>`}
+                            </div>
                             <span style=${{display:'inline-block',width:0,height:0,borderLeft:'5px solid transparent',borderRight:'5px solid transparent',...(expanded?{borderBottom:'6px solid #bbb'}:{borderTop:'6px solid #bbb'})}}></span>
                           </div>
                         </div>
-                        ${expanded && s.items && s.items.length>0 && html`
+                        ${expanded && html`
                           <div style=${{borderTop:'1px solid #f0f0f0',padding:'10px 16px',background:'#fafafa',display:'flex',flexDirection:'column',gap:6}}>
-                            ${s.items.map((it,j)=>html`
+                            ${s.items && s.items.map((it,j)=>html`
                               <div key=${j} style=${{display:'flex',justifyContent:'space-between',fontSize:12}}>
                                 <span style=${{color:'#555'}}>${it.name||it.product_name||''}</span>
                                 <span style=${{color:'#111',fontWeight:700}}>${+(it.qty||it.quantity||0)} ${it.unit||it.unit_name||''} × ${som(+(it.price||0))}</span>
                               </div>`)}
+                            <div style=${{borderTop:'1px dashed #e2e8f0',marginTop:4,paddingTop:6,display:'flex',flexDirection:'column',gap:4}}>
+                              <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'lov usuli</span><span style=${{color:'#111',fontWeight:700}}>${pmLabel(s.payment_method)}</span></div>
+                              ${breakdown.length>1 && breakdown.map((b,k)=>html`
+                                <div key=${k} style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>   · ${pmLabel(b.method)}</span><span style=${{color:'#111',fontWeight:600}}>${som(+(b.amount||0))}</span></div>`)}
+                              <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'landi</span><span style=${{color:'#111',fontWeight:700}}>${som(paid)}</span></div>
+                              ${debt>0 && html`<div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#ef4444'}}>Nasiya (qarz)</span><span style=${{color:'#ef4444',fontWeight:700}}>${som(debt)}</span></div>`}
+                            </div>
                           </div>`}
                       </div>`
                   } catch(e) { return html`<div key=${i} style=${{color:'#999',fontSize:12,padding:'10px 16px'}}>Xarid #${i+1}</div>` }
@@ -1434,16 +1544,7 @@ function App() {
   const total = cart.reduce((s,it)=>s+it.price*it.qty, 0)
   const count = cart.reduce((s,it)=>s+it.qty, 0)
 
-  function addToCart(p, unit, fromEl) {
-    const key  = p.id+'_'+(unit?.unit_id??'base')
-    const mult = unit?.multiplier || 1
-    const max  = p.stock_type==='tracked' ? Math.floor(p.stock/mult) : Infinity
-    if (max <= 0) return
-    setCart(c => {
-      const ex = c.find(x=>x.key===key)
-      if (ex) { if(ex.qty>=max) return c; return c.map(x=>x.key===key?{...x,qty:x.qty+1}:x) }
-      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,unit_name:unit?.unit_name||'dona',name:p.name,price:unit?.price,qty:1,maxQty:max,image:p.image}]
-    })
+  function _orbBounce(fromEl) {
     if (fromEl && navCartRef.current) {
       magicOrb(fromEl, navCartRef.current)
       setTimeout(() => {
@@ -1455,13 +1556,48 @@ function App() {
     }
     if (navigator?.vibrate) navigator.vibrate(20)
   }
+
+  function addToCart(p, unit, fromEl) {
+    const key  = p.id+'_'+(unit?.unit_id??'base')
+    const mult = unit?.multiplier || 1
+    const max  = p.stock_type==='tracked' ? Math.floor(p.stock/mult) : Infinity
+    if (max <= 0) return
+    setCart(c => {
+      const ex = c.find(x=>x.key===key)
+      if (ex) { if(ex.qty>=max) return c; return c.map(x=>x.key===key?{...x,qty:x.qty+1}:x) }
+      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',name:p.name,price:unit?.price,qty:1,maxQty:max,image:p.image}]
+    })
+    _orbBounce(fromEl)
+  }
+
+  function addVariantToCart(p, variant, qty, fromEl) {
+    const key = `${p.id}_v${variant.id}`
+    const max = variant.stock != null ? Math.floor(variant.stock) : Infinity
+    if (max <= 0) return
+    setCart(c => {
+      const ex = c.find(x=>x.key===key)
+      if (ex) return c.map(x=>x.key===key?{...x,qty:Math.min(x.qty+qty,max)}:x)
+      return [...c, {key,product_id:p.id,unit_id:null,variant_id:variant.id,variant_name:variant.name,unit_name:'dona',name:p.name,price:variant.price,qty,maxQty:max===Infinity?9999:max,image:p.image}]
+    })
+    _orbBounce(fromEl)
+  }
+
   const updQty = (key,q) => setCart(c=>{ const it=c.find(x=>x.key===key); if(!it)return c; const cap=it.maxQty?Math.min(q,it.maxQty):q; return cap<=0?c.filter(x=>x.key!==key):c.map(x=>x.key===key?{...x,qty:cap}:x) })
   const remItem = key => setCart(c=>c.filter(x=>x.key!==key))
 
   async function submitOrder(form) {
     setSubbing(true)
     try {
-      const body = {...form, customer_code:customer?.customer_code, items:cart.map(it=>({product_id:it.product_id,unit_id:it.unit_id,qty:it.qty}))}
+      const body = {
+        ...form,
+        customer_code: customer?.customer_code,
+        items: cart.map(it => ({
+          product_id: it.product_id,
+          ...(it.variant_id ? {variant_id: it.variant_id} : {}),
+          ...(it.unit_id    ? {unit_id:    it.unit_id}    : {}),
+          qty: it.qty,
+        }))
+      }
       const order = await api('/storefront/orders/',{method:'POST',body:JSON.stringify(body)})
       setCart([]); setChkOpen(false); setDone(order)
     } catch(e) { alert(e.message) } finally { setSubbing(false) }
@@ -1575,6 +1711,7 @@ function App() {
       product=${detailProd}
       onClose=${()=>setDetail(null)}
       onAdd=${addToCart}
+      onAddVariant=${addVariantToCart}
       cart=${cart}/>`}
 
     <!-- ── Category Drawer ───────────────────── -->

@@ -1383,9 +1383,11 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
               </div>
             </div>
             <div className="portal-stat-grid">
-              <div className=${'portal-stat'+(data.customer.debt>0?' debt':'')}>
+              <div className=${'portal-stat'+((data.customer.debt>0||Object.keys(data.customer.currency_debts||{}).length>0)?' debt':'')}>
                 <div className="portal-stat-label">Qarz</div>
                 <div className="portal-stat-val">${som(data.customer.debt||0)}</div>
+                ${Object.entries(data.customer.currency_debts||{}).map(([c,a],k)=>html`
+                  <div key=${k} className="portal-stat-val" style=${{fontSize:14,marginTop:2}}>${a} ${c}</div>`)}
               </div>
               <div className=${'portal-stat'+(data.customer.credit>0?' credit':'')}>
                 <div className="portal-stat-label">Ortiqcha to'lov</div>
@@ -1423,7 +1425,7 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
                           <div style=${{display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
                             <div style=${{textAlign:'right'}}>
                               <div style=${{fontWeight:800,fontSize:14,color:'#111',whiteSpace:'nowrap'}}>${som(total)}</div>
-                              ${debt>0 && html`<div style=${{fontSize:10,color:'#ef4444',fontWeight:700,whiteSpace:'nowrap'}}>Qarz: ${som(debt)}</div>`}
+                              ${debt>0 && html`<div style=${{fontSize:10,color:'#ef4444',fontWeight:700,whiteSpace:'nowrap'}}>Qarz: ${s.debt_currency&&s.debt_currency_amount?(s.debt_currency_amount+' '+s.debt_currency):som(debt)}</div>`}
                             </div>
                             <span style=${{display:'inline-block',width:0,height:0,borderLeft:'5px solid transparent',borderRight:'5px solid transparent',...(expanded?{borderBottom:'6px solid #bbb'}:{borderTop:'6px solid #bbb'})}}></span>
                           </div>
@@ -1440,7 +1442,8 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
                               ${breakdown.length>1 && breakdown.map((b,k)=>html`
                                 <div key=${k} style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>   · ${pmLabel(b.method)}</span><span style=${{color:'#111',fontWeight:600}}>${som(+(b.amount||0))}</span></div>`)}
                               <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'landi</span><span style=${{color:'#111',fontWeight:700}}>${som(paid)}</span></div>
-                              ${debt>0 && html`<div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#ef4444'}}>Nasiya (qarz)</span><span style=${{color:'#ef4444',fontWeight:700}}>${som(debt)}</span></div>`}
+                              ${debt>0 && html`<div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#ef4444'}}>Nasiya (qarz)</span><span style=${{color:'#ef4444',fontWeight:700}}>${s.debt_currency&&s.debt_currency_amount?(s.debt_currency_amount+' '+s.debt_currency):som(debt)}</span></div>`}
+                              ${debt>0 && s.debt_currency && s.debt_currency_amount && html`<div style=${{display:'flex',justifyContent:'space-between',fontSize:10,color:'#b45309'}}><span>Qarz ${s.debt_currency} da yozildi</span><span>kurs: ${som(s.debt_rate||0)} · ≈ ${som(debt)}</span></div>`}
                             </div>
                           </div>`}
                       </div>`

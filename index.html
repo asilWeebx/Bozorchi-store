@@ -814,6 +814,153 @@
     /* product card clickable */
     .product-item { cursor: pointer; }
     .product-img-wrap { cursor: zoom-in; }
+
+    /* ══════════════════════════════════════════════════════
+       ── DARK THEME ────────────────────────────────────────
+       ══════════════════════════════════════════════════════ */
+    body { background: #0b0b0b; color: #ededed; }
+
+    /* Header */
+    .header-search { background: #1a1a1a; }
+    .header-search input { color: #f0f0f0; }
+    .header-search input::placeholder { color: #777; }
+    .icon-btn { background: #1a1a1a; color: #cfcfcf; }
+    .icon-btn:hover { background: #262626; }
+    .login-btn { background: transparent; border-color: #333; color: #ddd; }
+    .login-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Category bar */
+    .cat-bar { background: #0b0b0b; border-bottom-color: #1c1c1c; }
+    .cat-chip { background: #161616; border-color: #2a2a2a; color: #b5b5b5; }
+    .cat-chip:hover { border-color: #444; color: #fff; }
+    .cat-chip.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+    /* Page title */
+    .page-title { color: #fff; }
+    .page-title span { color: #777; }
+    .state-text { color: #777; }
+
+    /* Product cards */
+    .product-img-wrap { background: #161616; }
+    .product-item:hover .product-img-wrap { background: #1d1d1d; }
+    .product-name { color: #f0f0f0; }
+    .product-meta { color: #888; }
+    .product-price { color: #fff; }
+    .price-orig-strike { color: #777; }
+    .unit-label { color: #888; }
+    .unit-select { background: #161616; border-color: #2a2a2a; color: #ddd; }
+    .unit-select:focus { border-color: #555; }
+    .unit-caret { color: #888; }
+    .qty-wrap { border-color: #2a2a2a; }
+    .qty-btn { color: #bbb; }
+    .qty-btn:hover { background: #242424; }
+    .qty-btn:active { background: #2c2c2c; }
+    .qty-num { color: #fff; border-color: #2a2a2a; }
+    .stock-out-overlay { background: rgba(0,0,0,0.6); }
+    .stock-out-tag { background: #262626; color: #999; }
+    .skel {
+      background: linear-gradient(90deg,#161616 25%,#222 50%,#161616 75%);
+      background-size: 200% 100%;
+    }
+
+    /* Product detail overlay */
+    .detail-overlay { background: #0b0b0b; }
+    .detail-topbar { background: rgba(11,11,11,0.95); border-bottom-color: #1c1c1c; }
+    .detail-back { color: #bbb; }
+    .detail-back:hover { color: #fff; }
+    .detail-close-btn { background: #1a1a1a; color: #aaa; }
+    .detail-img-side { background: #141414; border-right-color: #1c1c1c; }
+    @media (max-width: 640px) { .detail-img-side { border-bottom-color: #1c1c1c; } }
+    .detail-cat { color: #888; }
+    .detail-name { color: #fff; }
+    .detail-price { color: #fff; }
+    .detail-unit-label { color: #999; }
+    .detail-unit-chip { border-color: #2a2a2a; background: #161616; color: #ccc; }
+    .detail-unit-chip.active { border-color: var(--accent); background: rgba(232,160,32,.15); color: var(--accent); }
+    .detail-desc { color: #aaa; border-top-color: #1c1c1c; }
+    .detail-stock { color: #888; }
+    .detail-qty-wrap { border-color: #2a2a2a; }
+    .detail-qty-btn { color: #bbb; }
+    .detail-qty-btn:hover { background: #242424; }
+    .detail-qty-num { color: #fff; border-color: #2a2a2a; }
+    .detail-qty-input { color: #fff; }
+    .vc-name { color: #e5e5e5; }
+    .vc-stock { color: #888; }
+    .variant-chip.unavailable { border-color: #222 !important; }
+
+    /* Cart sheet */
+    .cart-sheet-new { background: #141414; }
+    .cart-handle { background: #333; }
+    .cart-title-new { color: #fff; }
+    .cart-count-chip { background: #242424; color: #aaa; }
+    .cart-thumb-new { background: #1c1c1c; }
+    .cart-name-new { color: #f0f0f0; }
+    .cart-unit-new { color: #888; }
+    .cqb { border-color: #2a2a2a; background: #161616; color: #ddd; }
+    .cqb:hover { background: #242424; border-color: #444; }
+    .cart-qty-input { border-color: #2a2a2a; background: #161616; color: #fff; }
+    .cqn { color: #fff; }
+    .cart-divider { background: #1c1c1c; }
+    .cart-footer-new { background: #141414; border-top-color: #1c1c1c; }
+    .cart-empty-text { color: #777; }
+    .cart-empty-sub { color: #555; }
+    .close-btn { background: #242424; color: #aaa; }
+    .close-btn:hover { background: #2e2e2e; }
+
+    /* Checkout / bottom sheet */
+    .bottom-sheet { background: #141414; }
+    .sheet-handle { background: #333; }
+    .sheet-title { color: #fff; }
+    .sheet-footer { border-top-color: #1c1c1c; }
+    .form-label { color: #999; }
+    .form-input { background: #161616; border-color: #2a2a2a; color: #fff; }
+    .form-input:focus { background: #1c1c1c; border-color: #555; }
+    .total-row { background: #1c1c1c; }
+    .total-label { color: #999; }
+    .total-val { color: #fff; }
+    .dark-btn { background: #fff; color: #000; }
+
+    .detail-added-badge { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); }
+    .err-box { background: rgba(239,68,68,0.12); color: #f87171; }
+
+    /* Modals: login / success */
+    .modal-card { background: #161616; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+
+    /* Customer portal */
+    .portal-sheet { background: #141414; }
+    .portal-handle { background: #333; }
+    .portal-title { color: #fff; }
+    .portal-tabs { border-bottom-color: #1c1c1c; }
+    .portal-tab { color: #777; }
+    .portal-profile-card { background: #1a1a1a; border-color: #262626; box-shadow: none; }
+    .portal-profile-name { color: #fff; }
+    .portal-profile-meta { color: #999; }
+    .portal-stat { background: #161616; border-color: #262626; }
+    .portal-stat.debt { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); }
+    .portal-stat.credit { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); }
+    .portal-pay-icon { background: rgba(34,197,94,0.12); }
+    .portal-list-item, .portal-payment-item { background: #161616; border-color: #262626; }
+    .portal-list-row, .portal-list-no { background: transparent; color: #f0f0f0; }
+    .portal-list-total { color: #fff; }
+    .portal-list-detail { background: #101010; border-top-color: #1c1c1c; }
+
+    /* Bottom nav — dark glass */
+    .bottom-nav {
+      background: rgba(26,26,26,0.55);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .bottom-nav::before {
+      background: linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
+    }
+    .nav-btn { color: rgba(190,190,200,0.7); }
+    .nav-btn.nav-active { color: #fff; }
+    .nav-btn.nav-active .nav-icon-wrap {
+      background: rgba(255,255,255,0.14);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
   </style>
 </head>
 <body>
@@ -1321,14 +1468,14 @@ function Login({ open, onClose, onLogin }) {
     <div className="modal-center fade-in">
       <div className="modal-card pop-in">
         <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-          <div style=${{fontWeight:700,fontSize:17,color:'#111'}}>Mijoz sifatida kirish</div>
+          <div style=${{fontWeight:700,fontSize:17,color:'#fff'}}>Mijoz sifatida kirish</div>
           <button className="close-btn" onClick=${onClose}><${IX}/></button>
         </div>
         <p style=${{fontSize:13,color:'#aaa',marginBottom:20,textAlign:'left'}}>Do'kondan olgan ID raqamingizni kiriting</p>
         <input value=${code} onInput=${e=>setCode(e.target.value.toUpperCase())}
           onKeyDown=${e=>e.key==='Enter'&&go()}
           placeholder="CUST-XXXXXX"
-          style=${{width:'100%',height:48,border:'1.5px solid #e5e5e5',borderRadius:10,paddingLeft:14,fontSize:15,fontFamily:'monospace',letterSpacing:2,color:'#111',background:'#fafafa',marginBottom:err?10:0}}/>
+          style=${{width:'100%',height:48,border:'1.5px solid #2a2a2a',borderRadius:10,paddingLeft:14,fontSize:15,fontFamily:'monospace',letterSpacing:2,color:'#fff',background:'#161616',marginBottom:err?10:0}}/>
         ${err && html`<div className="err-box" style=${{marginBottom:10}}>${err}</div>`}
         <button className="primary-btn" style=${{marginTop:12}} onClick=${go} disabled=${busy}>
           ${busy ? 'Tekshirilmoqda...' : 'Kirish'}
@@ -1343,7 +1490,7 @@ function Success({ order, onClose }) {
     <div className="modal-center fade-in">
       <div className="modal-card pop-in">
         <div className="success-icon">✅</div>
-        <div style=${{fontWeight:800,fontSize:20,color:'#111',marginBottom:8}}>Buyurtma qabul qilindi!</div>
+        <div style=${{fontWeight:800,fontSize:20,color:'#fff',marginBottom:8}}>Buyurtma qabul qilindi!</div>
         <div style=${{color:'#aaa',fontSize:13,marginBottom:4}}>Buyurtma raqami</div>
         <div style=${{fontWeight:800,fontSize:20,color:AD,marginBottom:8}}>${order.order_no}</div>
         <div style=${{color:'#bbb',fontSize:13,marginBottom:28}}>Do'kon tez orada siz bilan bog'lanadi</div>
@@ -1441,9 +1588,9 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
                 <div className="portal-stat-val">${som(data.customer.credit||0)}</div>
               </div>
             </div>
-            <div style=${{border:'1.5px solid #f0f0f0',borderRadius:14,padding:'14px 16px',background:'#fafafa',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div style=${{border:'1.5px solid #262626',borderRadius:14,padding:'14px 16px',background:'#101010',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style=${{fontSize:12,color:'#888',fontWeight:600}}>Jami xarid qilingan</span>
-              <span style=${{fontSize:16,fontWeight:800,color:'#111'}}>${som(data.sales.reduce((s,x)=>s+(x.total||0),0))}</span>
+              <span style=${{fontSize:16,fontWeight:800,color:'#f0f0f0'}}>${som(data.sales.reduce((s,x)=>s+(x.total||0),0))}</span>
             </div>`}
 
           <!-- Sales tab -->
@@ -1460,35 +1607,35 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
                     const breakdown = s.payment_breakdown||[]
                     const expanded = openSale===i
                     return html`
-                      <div key=${i} style=${{border:'1.5px solid #eee',borderRadius:14,overflow:'hidden',background:'#fff',flexShrink:0}}>
-                        <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px',cursor:'pointer',background:'#fff',minHeight:52}} onClick=${()=>setOpenSale(expanded?null:i)}>
+                      <div key=${i} style=${{border:'1.5px solid #262626',borderRadius:14,overflow:'hidden',background:'#161616',flexShrink:0}}>
+                        <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px',cursor:'pointer',background:'#161616',minHeight:52}} onClick=${()=>setOpenSale(expanded?null:i)}>
                           <div style=${{flex:1,minWidth:0}}>
-                            <div style=${{fontWeight:700,fontSize:13,color:'#111',marginBottom:2}}>${label}</div>
+                            <div style=${{fontWeight:700,fontSize:13,color:'#f0f0f0',marginBottom:2}}>${label}</div>
                             <div style=${{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
                               <span style=${{fontSize:11,color:'#999'}}>${dateStr}</span>
-                              <span style=${{fontSize:10,color:'#475569',background:'#f1f5f9',padding:'1px 6px',borderRadius:5,fontWeight:600}}>${pmLabel(s.payment_method)}</span>
+                              <span style=${{fontSize:10,color:'#93c5fd',background:'rgba(59,130,246,0.15)',padding:'1px 6px',borderRadius:5,fontWeight:600}}>${pmLabel(s.payment_method)}</span>
                             </div>
                           </div>
                           <div style=${{display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
                             <div style=${{textAlign:'right'}}>
-                              <div style=${{fontWeight:800,fontSize:14,color:'#111',whiteSpace:'nowrap'}}>${som(total)}</div>
+                              <div style=${{fontWeight:800,fontSize:14,color:'#f0f0f0',whiteSpace:'nowrap'}}>${som(total)}</div>
                               ${debt>0 && html`<div style=${{fontSize:10,color:'#ef4444',fontWeight:700,whiteSpace:'nowrap'}}>Qarz: ${s.debt_currency&&s.debt_currency_amount?(s.debt_currency_amount+' '+s.debt_currency):som(debt)}</div>`}
                             </div>
                             <span style=${{display:'inline-block',width:0,height:0,borderLeft:'5px solid transparent',borderRight:'5px solid transparent',...(expanded?{borderBottom:'6px solid #bbb'}:{borderTop:'6px solid #bbb'})}}></span>
                           </div>
                         </div>
                         ${expanded && html`
-                          <div style=${{borderTop:'1px solid #f0f0f0',padding:'10px 16px',background:'#fafafa',display:'flex',flexDirection:'column',gap:6}}>
+                          <div style=${{borderTop:'1px solid #1c1c1c',padding:'10px 16px',background:'#101010',display:'flex',flexDirection:'column',gap:6}}>
                             ${s.items && s.items.map((it,j)=>html`
                               <div key=${j} style=${{display:'flex',justifyContent:'space-between',fontSize:12}}>
-                                <span style=${{color:'#555'}}>${it.name||it.product_name||''}</span>
-                                <span style=${{color:'#111',fontWeight:700}}>${+(it.qty||it.quantity||0)} ${it.unit||it.unit_name||''} × ${som(+(it.price||0))}</span>
+                                <span style=${{color:'#bbb'}}>${it.name||it.product_name||''}</span>
+                                <span style=${{color:'#f0f0f0',fontWeight:700}}>${+(it.qty||it.quantity||0)} ${it.unit||it.unit_name||''} × ${som(+(it.price||0))}</span>
                               </div>`)}
-                            <div style=${{borderTop:'1px dashed #e2e8f0',marginTop:4,paddingTop:6,display:'flex',flexDirection:'column',gap:4}}>
-                              <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'lov usuli</span><span style=${{color:'#111',fontWeight:700}}>${pmLabel(s.payment_method)}</span></div>
+                            <div style=${{borderTop:'1px dashed #2a2a2a',marginTop:4,paddingTop:6,display:'flex',flexDirection:'column',gap:4}}>
+                              <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'lov usuli</span><span style=${{color:'#f0f0f0',fontWeight:700}}>${pmLabel(s.payment_method)}</span></div>
                               ${breakdown.length>1 && breakdown.map((b,k)=>html`
-                                <div key=${k} style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>   · ${pmLabel(b.method)}</span><span style=${{color:'#111',fontWeight:600}}>${som(+(b.amount||0))}</span></div>`)}
-                              <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'landi</span><span style=${{color:'#111',fontWeight:700}}>${som(paid)}</span></div>
+                                <div key=${k} style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>   · ${pmLabel(b.method)}</span><span style=${{color:'#f0f0f0',fontWeight:600}}>${som(+(b.amount||0))}</span></div>`)}
+                              <div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#999'}}>To'landi</span><span style=${{color:'#f0f0f0',fontWeight:700}}>${som(paid)}</span></div>
                               ${debt>0 && html`<div style=${{display:'flex',justifyContent:'space-between',fontSize:11}}><span style=${{color:'#ef4444'}}>Nasiya (qarz)</span><span style=${{color:'#ef4444',fontWeight:700}}>${s.debt_currency&&s.debt_currency_amount?(s.debt_currency_amount+' '+s.debt_currency):som(debt)}</span></div>`}
                               ${debt>0 && s.debt_currency && s.debt_currency_amount && html`<div style=${{display:'flex',justifyContent:'space-between',fontSize:10,color:'#b45309'}}><span>Qarz ${s.debt_currency} da yozildi</span><span>kurs: ${som(s.debt_rate||0)} · ≈ ${som(debt)}</span></div>`}
                             </div>
@@ -1505,12 +1652,12 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
                   const sColor = (ST[o.status]||['','#999'])[1]
                   const sLabel = (ST[o.status]||[o.status||'?'])[0]
                   return html`
-                    <div key=${i} style=${{border:'1.5px solid #eee',borderRadius:14,overflow:'hidden',background:'#fff',flexShrink:0}}>
-                      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px',background:'#fff',minHeight:52}}>
+                    <div key=${i} style=${{border:'1.5px solid #262626',borderRadius:14,overflow:'hidden',background:'#161616',flexShrink:0}}>
+                      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px',background:'#161616',minHeight:52}}>
                         <div>
-                          <div style=${{fontWeight:700,fontSize:13,color:'#111'}}>${o.order_no||('Zakaz #'+(i+1))}</div>
+                          <div style=${{fontWeight:700,fontSize:13,color:'#f0f0f0'}}>${o.order_no||('Zakaz #'+(i+1))}</div>
                           <div style=${{fontSize:11,color:'#999',marginTop:2}}>${o.created_at?fmt(o.created_at):''}</div>
-                          <div style=${{fontWeight:800,fontSize:14,color:'#111',marginTop:6}}>${som(+(o.total||0))}</div>
+                          <div style=${{fontWeight:800,fontSize:14,color:'#f0f0f0',marginTop:6}}>${som(+(o.total||0))}</div>
                         </div>
                         <span style=${{color:sColor,background:sColor+'1a',fontSize:11,fontWeight:700,borderRadius:999,padding:'3px 10px',flexShrink:0}}>${sLabel}</span>
                       </div>
@@ -1522,13 +1669,13 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
             ${!data.payments.length
               ? html`<div style=${{textAlign:'center',padding:'48px 20px',color:'#ccc',fontSize:14,fontWeight:600}}>💳 To'lovlar yo'q</div>`
               : data.payments.map((p,i) => html`
-                <div key=${i} style=${{display:'flex',justifyContent:'space-between',alignItems:'center',border:'1.5px solid #eee',borderRadius:14,padding:'13px 16px',background:'#fff',flexShrink:0}}>
+                <div key=${i} style=${{display:'flex',justifyContent:'space-between',alignItems:'center',border:'1.5px solid #262626',borderRadius:14,padding:'13px 16px',background:'#161616',flexShrink:0}}>
                   <div>
                     <div style=${{fontWeight:700,fontSize:15,color:'#22c55e'}}>+${som(+(p.amount||0))}</div>
                     <div style=${{fontSize:11,color:'#999',marginTop:2}}>${p.created_at?fmt(p.created_at):''}</div>
                     ${p.note?html`<div style=${{fontSize:11,color:'#bbb',marginTop:2}}>${p.note}</div>`:null}
                   </div>
-                  <div style=${{width:36,height:36,borderRadius:'50%',background:'#f0fdf4',display:'flex',alignItems:'center',justifyContent:'center',color:'#22c55e',fontSize:16,fontWeight:700,flexShrink:0}}>✓</div>
+                  <div style=${{width:36,height:36,borderRadius:'50%',background:'rgba(34,197,94,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'#22c55e',fontSize:16,fontWeight:700,flexShrink:0}}>✓</div>
                 </div>`)}`}
         </div>
       </div>
@@ -1667,7 +1814,7 @@ function App() {
           ? html`<div className="header-search fade-in" style=${{maxWidth:'none',flex:1}}>
               <${ISearch} s=${16}/>
               <input ref=${searchRef} value=${search} onInput=${e=>setSearch(e.target.value)}
-                placeholder="Mahsulot qidirish..." style=${{flex:1,border:'none',background:'transparent',fontSize:14,color:'#111'}}/>
+                placeholder="Mahsulot qidirish..." style=${{flex:1,border:'none',background:'transparent',fontSize:14,color:'#f0f0f0'}}/>
             </div>
             <button className="login-btn" onClick=${()=>{setSrchOpen(false);setSearch('')}}>Bekor</button>`
 

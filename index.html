@@ -1273,6 +1273,7 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
   const addBtnRef = useRef(null)
 
   const unit   = !hasVariants ? (p.units?.find(u => u.unit_id === unitId) || p.units?.[0]) : null
+  const isWeight = !hasVariants && isWeightUnit(unit?.unit_name)  // kg tovar — kasr miqdor, detaildan qo'shiladi
   const mult   = unit?.multiplier || 1
   const maxQty = hasVariants
     ? (p.in_stock ? 1 : 0)
@@ -1337,10 +1338,10 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
 
       <!-- Controls -->
       <div className="controls-row" onClick=${e=>e.stopPropagation()}>
-        ${hasVariants
+        ${(hasVariants || isWeight)
           ? html`<button className="add-btn" style=${{flex:1}} onClick=${e=>{e.stopPropagation();onDetail(p)}}
               disabled=${out}>
-              ${out ? 'Tugadi' : 'Tanlang'}
+              ${out ? 'Tugadi' : (hasVariants ? 'Tanlang' : 'Savatga')}
             </button>`
           : html`
             <div className="qty-wrap">
@@ -1368,6 +1369,29 @@ function Skeleton() {
           <div className="skel" style=${{height:36,borderRadius:8}}></div>
         </div>`)}
     </div>`
+}
+
+// ── CartWeightInput — kg tovar uchun kasr miqdor (nuqta bilan) ─────────────
+// type="number" oraliq "0." ni bo'sh deb qaytaradi → 0 → o'chib ketardi.
+// Shu sababli text sifatida qabul qilamiz va yozayotganda o'chirmaymiz.
+function CartWeightInput({ item, setQty }) {
+  const [val, setVal] = useState(() => fmtQty(item.qty))
+  const onType = raw => {
+    let s = raw.replace(',', '.').replace(/[^0-9.]/g, '')      // faqat raqam va nuqta
+    const parts = s.split('.')
+    if (parts.length > 2) s = parts[0] + '.' + parts.slice(1).join('')  // bitta nuqta
+    setVal(s)
+    const n = parseFloat(s)
+    if (!isNaN(n) && n > 0) setQty(item.key, item.maxQty ? Math.min(n, item.maxQty) : n)
+  }
+  const onBlur = () => {
+    let n = parseFloat(val)
+    if (isNaN(n) || n <= 0) n = item.qty                       // bo'sh/noto'g'ri — o'chirmay, eskisiga qaytar
+    if (item.maxQty) n = Math.min(n, item.maxQty)
+    setVal(fmtQty(n))
+  }
+  return html`<input type="text" inputMode="decimal" className="cart-qty-input"
+    value=${val} onInput=${e=>onType(e.target.value)} onBlur=${onBlur}/>`
 }
 
 // ── CartSheet ────────────────────────────────────────────────────────────
@@ -1409,9 +1433,7 @@ function CartSheet({ open, onClose, items, setQty, remove, total, onCheckout }) 
                   </div>
                   ${it.weight
                     ? html`<div className="cart-qty-ctrl">
-                        <input type="number" step="0.001" min="0" className="cart-qty-input"
-                          defaultValue=${it.qty}
-                          onChange=${e=>setQty(it.key, +e.target.value||0)}/>
+                        <${CartWeightInput} item=${it} setQty=${setQty}/>
                         <span className="cqu">${it.unit_name}</span>
                         <button className="cqb cqb-del" onClick=${()=>remove(it.key)}><${IX} s=${12}/></button>
                       </div>`

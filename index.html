@@ -719,6 +719,16 @@
       width: 40px; text-align: center; font-size: 16px; font-weight: 700;
       border-left: 2px solid #e8e8e8; border-right: 2px solid #e8e8e8;
     }
+    /* Og'irlik (kg) tovar — kasr miqdor kiritish */
+    .detail-qty-wrap.weight { padding: 0 6px 0 12px; gap: 4px; }
+    .detail-qty-input {
+      width: 76px; height: 100%; border: none; background: transparent;
+      font-size: 17px; font-weight: 700; text-align: center; color: #111; outline: none;
+      -moz-appearance: textfield;
+    }
+    .detail-qty-input::-webkit-outer-spin-button,
+    .detail-qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .detail-qty-unit { font-size: 13px; font-weight: 700; color: var(--accent-dark); white-space: nowrap; padding-right: 6px; }
 
     /* ── Cart Redesign ───────────────────────── */
     .cart-sheet-new {
@@ -763,6 +773,16 @@
     .cqb:hover { background: #f5f5f5; border-color: #ccc; }
     .cqb.cqb-del { border-color: #fee2e2; color: #ef4444; }
     .cqb.cqb-del:hover { background: #fef2f2; }
+    /* Savatda kg tovar — kasr miqdor input */
+    .cart-qty-input {
+      width: 58px; height: 30px; border: 1.5px solid #e8e8e8; border-radius: 9px;
+      text-align: center; font-size: 13px; font-weight: 700; color: #111; outline: none;
+      -moz-appearance: textfield;
+    }
+    .cart-qty-input:focus { border-color: var(--accent); }
+    .cart-qty-input::-webkit-outer-spin-button,
+    .cart-qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .cqu { font-size: 11px; font-weight: 700; color: var(--accent-dark); }
     .cqn { width: 28px; text-align: center; font-size: 14px; font-weight: 800; color: #111; }
     .cart-divider { height: 1px; background: #f5f5f5; margin: 0 20px; }
     .cart-footer-new { padding: 16px 20px 28px; background: #fff; border-top: 1px solid #f0f0f0; }
@@ -804,6 +824,10 @@ const HDR = { 'Content-Type': 'application/json', 'X-Storefront-Key': STOREFRONT
 const ACCENT = '#E8A020', AD = '#C8880A'
 
 const som   = n => { const v = Math.round(+n||0); return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' so\'m' }
+// Og'irlik/o'lchov birlikmi (kg, gramm) — kasr miqdor bilan sotiladi
+const isWeightUnit = name => /kilogram|kilogramm|gramm|\bkg\b|\bg\b/i.test((name||'').trim())
+// Miqdorni ko'rsatish: butun bo'lsa "2", kasr bo'lsa "0.5"
+const fmtQty = n => Number.isInteger(+n) ? String(+n) : String(+(+n).toFixed(3))
 const PM_LABELS = { cash:'Naqd', card:'Karta', transfer:"O'tkazma", credit:'Nasiya', mixed:'Aralash', click:'Click', payme:'Payme', uzum:'Uzum', humo:'Humo', uzcard:'UzCard', installment:"Bo'lib to'lash", exchange_credit:'Ayirboshlash' }
 const pmLabel = m => PM_LABELS[m] || (m || '—')
 const media = u => !u ? '' : u.startsWith('http') ? u : API_URL.replace(/\/api\/?$/,'') + u
@@ -860,19 +884,22 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
   const displayPrice    = hasVariants ? (selVariant?.price ?? 0) : (unit?.price ?? 0)
   const displayOrigPrice = hasVariants ? (selVariant?.original_price ?? null) : (unit?.original_price ?? null)
   const mult   = unit?.multiplier || 1
+  const isWeight = !hasVariants && isWeightUnit(unit?.unit_name)  // kg tovar — kasr miqdor
   const maxQty = hasVariants
     ? (selVariant?.in_stock ? (selVariant.stock != null ? Math.floor(selVariant.stock) : Infinity) : 0)
-    : (p.stock_type === 'tracked' ? Math.floor(p.stock / mult) : Infinity)
+    : (p.stock_type === 'tracked' ? (isWeight ? p.stock / mult : Math.floor(p.stock / mult)) : Infinity)
   const cartKey = hasVariants ? `${p.id}_v${variantId}` : `${p.id}_${unit?.unit_id??'base'}`
   const inCart = cart.find(x => x.key === cartKey)?.qty || 0
   const out    = maxQty <= 0
 
   const handleAdd = () => {
     if (out || added) return
+    const q = isWeight ? Math.max(0.001, +qty || 0) : Math.max(1, Math.round(+qty || 1))
+    if (!q) return
     if (hasVariants) {
-      onAddVariant(p, selVariant, qty, addRef.current)
+      onAddVariant(p, selVariant, q, addRef.current)
     } else {
-      for (let i = 0; i < qty; i++) onAdd(p, unit, addRef.current)
+      onAdd(p, unit, addRef.current, q)   // addToCart endi qty qabul qiladi (kasr ham)
     }
     setAdded(true)
     setTimeout(() => setAdded(false), 1400)
@@ -945,23 +972,30 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
             <div className="detail-stock out">❌ Stokda yo'q</div>`}
           ${!hasVariants && p.stock_type === 'tracked' && html`
             <div className=${'detail-stock'+(out?' out':' ok')}>
-              ${out ? '❌ Stokda yo\'q' : '✓ Stokda: '+maxQty+' '+(unit?.unit_name||'dona')}
+              ${out ? '❌ Stokda yo\'q' : '✓ Stokda: '+fmtQty(maxQty)+' '+(unit?.unit_name||'dona')}
             </div>`}
 
           <!-- In cart badge -->
           ${inCart > 0 && html`
             <div className="detail-added-badge">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Savatda: ${inCart} ta
+              Savatda: ${fmtQty(inCart)} ${isWeight ? (unit?.unit_name||'kg') : 'ta'}
             </div>`}
 
           <!-- Qty + Add -->
           <div className="detail-controls">
-            <div className="detail-qty-wrap">
-              <button className="detail-qty-btn" onClick=${()=>setQty(q=>Math.max(1,q-1))}>−</button>
-              <span className="detail-qty-num">${qty}</span>
-              <button className="detail-qty-btn" onClick=${()=>setQty(q=>maxQty===Infinity?q+1:Math.min(q+1,maxQty-inCart))}>+</button>
-            </div>
+            ${isWeight
+              ? html`<div className="detail-qty-wrap weight">
+                  <input type="number" step="0.001" min="0" className="detail-qty-input"
+                    defaultValue="1" placeholder="0.5"
+                    onInput=${e=>setQty(+e.target.value||0)}/>
+                  <span className="detail-qty-unit">${unit?.unit_name||'kg'}</span>
+                </div>`
+              : html`<div className="detail-qty-wrap">
+                  <button className="detail-qty-btn" onClick=${()=>setQty(q=>Math.max(1,q-1))}>−</button>
+                  <span className="detail-qty-num">${qty}</span>
+                  <button className="detail-qty-btn" onClick=${()=>setQty(q=>maxQty===Infinity?q+1:Math.min(q+1,maxQty-inCart))}>+</button>
+                </div>`}
             <button ref=${addRef} className=${'detail-add-btn'+(added?' btn-added':'')} onClick=${handleAdd} disabled=${out}>
               ${added
                 ? html`<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Qo'shildi!`
@@ -1185,16 +1219,24 @@ function CartSheet({ open, onClose, items, setQty, remove, total, onCheckout }) 
                   <div className="cart-info-new">
                     <div className="cart-name-new clamp2">${it.name}${it.variant_name ? ' · '+it.variant_name : ''}</div>
                     <div className="cart-price-new">${som(it.price * it.qty)}</div>
-                    <div className="cart-unit-new">${som(it.price)} × ${it.qty} ${it.unit_name}</div>
+                    <div className="cart-unit-new">${som(it.price)} × ${fmtQty(it.qty)} ${it.unit_name}</div>
                   </div>
-                  <div className="cart-qty-ctrl">
-                    <button className=${'cqb'+(it.qty===1?' cqb-del':'')}
-                      onClick=${()=>it.qty===1?remove(it.key):setQty(it.key,it.qty-1)}>
-                      ${it.qty===1?html`<${IX} s=${12}/>`:html`−`}
-                    </button>
-                    <span className="cqn">${it.qty}</span>
-                    <button className="cqb" onClick=${()=>setQty(it.key,it.qty+1)}>+</button>
-                  </div>
+                  ${it.weight
+                    ? html`<div className="cart-qty-ctrl">
+                        <input type="number" step="0.001" min="0" className="cart-qty-input"
+                          defaultValue=${it.qty}
+                          onChange=${e=>setQty(it.key, +e.target.value||0)}/>
+                        <span className="cqu">${it.unit_name}</span>
+                        <button className="cqb cqb-del" onClick=${()=>remove(it.key)}><${IX} s=${12}/></button>
+                      </div>`
+                    : html`<div className="cart-qty-ctrl">
+                        <button className=${'cqb'+(it.qty===1?' cqb-del':'')}
+                          onClick=${()=>it.qty===1?remove(it.key):setQty(it.key,it.qty-1)}>
+                          ${it.qty===1?html`<${IX} s=${12}/>`:html`−`}
+                        </button>
+                        <span className="cqn">${it.qty}</span>
+                        <button className="cqb" onClick=${()=>setQty(it.key,it.qty+1)}>+</button>
+                      </div>`}
                 </div>
                 ${idx < items.length-1 && html`<div className="cart-divider"></div>`}
               </${React.Fragment}>`)
@@ -1560,15 +1602,17 @@ function App() {
     if (navigator?.vibrate) navigator.vibrate(20)
   }
 
-  function addToCart(p, unit, fromEl) {
+  function addToCart(p, unit, fromEl, qty=1) {
     const key  = p.id+'_'+(unit?.unit_id??'base')
     const mult = unit?.multiplier || 1
-    const max  = p.stock_type==='tracked' ? Math.floor(p.stock/mult) : Infinity
+    // Og'irlik (kg) tovarda qoldiq kasr bo'lishi mumkin — floor qilmaymiz
+    const weight = isWeightUnit(unit?.unit_name)
+    const max  = p.stock_type==='tracked' ? (weight ? p.stock/mult : Math.floor(p.stock/mult)) : Infinity
     if (max <= 0) return
     setCart(c => {
       const ex = c.find(x=>x.key===key)
-      if (ex) { if(ex.qty>=max) return c; return c.map(x=>x.key===key?{...x,qty:x.qty+1}:x) }
-      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',name:p.name,price:unit?.price,qty:1,maxQty:max,image:p.image}]
+      if (ex) { if(ex.qty>=max) return c; return c.map(x=>x.key===key?{...x,qty:Math.min(x.qty+qty,max)}:x) }
+      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',weight,name:p.name,price:unit?.price,qty:Math.min(qty,max),maxQty:max,image:p.image}]
     })
     _orbBounce(fromEl)
   }

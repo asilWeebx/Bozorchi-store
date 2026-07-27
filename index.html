@@ -961,6 +961,40 @@
       background: rgba(255,255,255,0.14);
       box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
     }
+
+    /* ── "Mening hisobim" — polished & comfortable ────────── */
+    .portal-title { letter-spacing: -.3px; }
+    .portal-tab { font-size: 13px; padding: 10px 4px 12px; }
+    .portal-profile-card { padding: 18px 20px; border-radius: 18px; gap: 16px; }
+    .portal-avatar { box-shadow: 0 4px 14px rgba(232,160,32,.35); }
+    .portal-stat { border-radius: 16px; padding: 16px 18px; }
+    .portal-stat-val { font-size: 18px; }
+    .portal-list-item, .portal-payment-item { border-radius: 16px; }
+
+    /* Mobile: comfortable bottom sheet with a touch more height */
+    @media (max-width: 640px) {
+      .portal-sheet { max-height: 92vh; border-radius: 22px 22px 0 0; }
+      .portal-body { padding-bottom: 40px; }
+    }
+
+    /* Desktop / tablet: centered dialog instead of a floating bottom bar */
+    @media (min-width: 641px) {
+      .portal-overlay {
+        display: flex; align-items: center; justify-content: center;
+        padding: 24px;
+      }
+      .portal-overlay .portal-sheet {
+        position: relative; bottom: auto; margin: 0;
+        width: 560px; max-width: 100%;
+        max-height: 86vh;
+        border-radius: 24px;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+        animation: popIn .26s cubic-bezier(.34,1.4,.64,1) both;
+      }
+      /* handle bar is a mobile affordance — hide on desktop */
+      .portal-overlay .portal-handle { display: none; }
+      .portal-overlay .portal-head { padding-top: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -1539,7 +1573,7 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
   }
 
   return html`
-    <div className="overlay-bg fade-in">
+    <div className="overlay-bg portal-overlay fade-in">
       <div className="overlay-dim" onClick=${onClose}></div>
       <div className="portal-sheet slide-up">
         <div className="portal-handle"></div>

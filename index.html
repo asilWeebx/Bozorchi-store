@@ -840,9 +840,25 @@
     .page-title span { color: #777; }
     .state-text { color: #777; }
 
-    /* Product cards */
-    .product-img-wrap { background: #161616; }
-    .product-item:hover .product-img-wrap { background: #1d1d1d; }
+    /* Product cards — iOS-style: light image tile + round add button */
+    .product-img-wrap { background: #f2f2f3; border-radius: 16px; margin-bottom: 12px; }
+    .product-item:hover .product-img-wrap { background: #e9e9ec; }
+    .product-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-top: auto;
+    }
+    .product-foot .product-price { margin-bottom: 0; }
+    .add-round {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      background: #FBBC05; color: #000; border: none;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(251,188,5,.32);
+      transition: transform .12s ease, background .15s ease;
+    }
+    .add-round:hover:not(:disabled) { background: #e6ac00; }
+    .add-round:active:not(:disabled) { transform: scale(.88); }
+    .add-round:disabled { background: #262626; color: #666; box-shadow: none; cursor: not-allowed; }
+    .add-round.added { background: #22c55e; color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,.35); }
     .product-name { color: #f0f0f0; }
     .product-meta { color: #888; }
     .product-price { color: #fff; }
@@ -1296,6 +1312,13 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
     setTimeout(() => setAdded(false), 1200)
   }
 
+  const onRoundAdd = (e) => {
+    e.stopPropagation()
+    if (out) return
+    if (hasVariants || isWeight) { onDetail(p); return }   // variant/kg — detaildan tanlanadi
+    handleAdd(e)
+  }
+
   return html`
     <div className="product-item fade-up" onClick=${()=>onDetail(p)}>
       <!-- Image -->
@@ -1304,7 +1327,7 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
           ? html`<img src=${media(p.image)} alt=${p.name} loading="lazy" onError=${e=>{e.target.style.display='none'}}/>`
           : html`<${IBox} s=${48}/>`}
         ${out && html`<div className="stock-out-overlay"><span className="stock-out-tag">Tugadi</span></div>`}
-        ${inCart > 0 && html`<div className="in-cart-dot">${inCart}</div>`}
+        ${inCart > 0 && html`<div className="in-cart-dot">${fmtQty(inCart)}</div>`}
       </div>
 
       <!-- Name -->
@@ -1313,45 +1336,24 @@ function ProductItem({ p, onAdd, cart, showImages, onDetail }) {
       <!-- Meta: stock info -->
       ${!hasVariants && p.stock_type === 'tracked' && !out && html`
         <div className="product-meta">${maxQty} ${unit?.unit_name||'dona'} mavjud</div>`}
-      ${out && html`<div className="product-meta" style=${{color:'#e53e3e'}}>Sotib bo'lindi</div>`}
+      ${out && html`<div className="product-meta" style=${{color:'#f87171'}}>Sotib bo'lindi</div>`}
       ${hasVariants && !out && html`
         <div className="product-meta">${p.variants.filter(v=>v.in_stock).length} variant mavjud</div>`}
 
-      <!-- Price -->
-      <div className="product-price">
-        ${displayOrigPrice != null && html`<span className="price-orig-strike">${hasVariants ? 'dan '+som(displayOrigPrice) : som(displayOrigPrice)}</span>`}
-        ${hasVariants ? 'dan '+som(displayPrice) : som(displayPrice)}
-        ${p.discount_percent > 0 && html`<span className="disc-badge">−${Math.round(p.discount_percent)}%</span>`}
-      </div>
-
-      <!-- Unit selector (non-variant only) -->
-      ${!hasVariants && p.units?.length > 1 && html`
-        <div className="unit-row" onClick=${e=>e.stopPropagation()}>
-          <span className="unit-label">Birlik:</span>
-          <div className="unit-select-wrap">
-            <select className="unit-select" value=${unitId??''} onChange=${e=>setUnitId(+e.target.value)}>
-              ${p.units.map(u => html`<option key=${u.unit_id} value=${u.unit_id}>${u.unit_name}</option>`)}
-            </select>
-            <span className="unit-caret"><${ICaret} s=${11}/></span>
-          </div>
-        </div>`}
-
-      <!-- Controls -->
-      <div className="controls-row" onClick=${e=>e.stopPropagation()}>
-        ${(hasVariants || isWeight)
-          ? html`<button className="add-btn" style=${{flex:1}} onClick=${e=>{e.stopPropagation();onDetail(p)}}
-              disabled=${out}>
-              ${out ? 'Tugadi' : (hasVariants ? 'Tanlang' : 'Savatga')}
-            </button>`
-          : html`
-            <div className="qty-wrap">
-              <button className="qty-btn" onClick=${e=>{e.stopPropagation();setQty(q=>Math.max(1,q-1))}}>−</button>
-              <span className="qty-num">${qty}</span>
-              <button className="qty-btn" onClick=${e=>{e.stopPropagation();setQty(q=>maxQty===Infinity?q+1:Math.min(q+1,maxQty-inCart))}}>+</button>
-            </div>
-            <button ref=${addBtnRef} className=${'add-btn'+(out?' btn-tugadi':added?' btn-added':'')} onClick=${handleAdd} disabled=${out}>
-              ${out ? 'Tugadi' : added ? '✓' : 'Savatga'}
-            </button>`}
+      <!-- Foot: price + round add button -->
+      <div className="product-foot">
+        <div className="product-price">
+          ${displayOrigPrice != null && html`<span className="price-orig-strike">${hasVariants ? 'dan '+som(displayOrigPrice) : som(displayOrigPrice)}</span>`}
+          ${hasVariants ? 'dan '+som(displayPrice) : som(displayPrice)}
+          ${p.discount_percent > 0 && html`<span className="disc-badge">−${Math.round(p.discount_percent)}%</span>`}
+        </div>
+        <button ref=${addBtnRef}
+          className=${'add-round'+(added?' added':'')}
+          onClick=${onRoundAdd} disabled=${out} title="Savatga qo'shish">
+          ${added
+            ? html`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+            : html`<${ICart} s=${19}/>`}
+        </button>
       </div>
     </div>`
 }

@@ -840,12 +840,25 @@
     .page-title span { color: #777; }
     .state-text { color: #777; }
 
-    /* Product cards — iOS-style: light image tile + round add button */
-    .product-img-wrap { background: #f2f2f3; border-radius: 16px; margin-bottom: 12px; }
-    .product-item:hover .product-img-wrap { background: #e9e9ec; }
+    /* Product cards — white card on dark bg (iOS-style) */
+    .product-grid { gap: 18px 16px; }
+    @media (max-width: 640px) { .product-grid { gap: 14px 12px; } }
+    .product-item {
+      background: #ffffff; border-radius: 20px;
+      padding: 10px 10px 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .product-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+    .product-img-wrap { background: #f4f4f5; border-radius: 14px; margin-bottom: 12px; }
+    .product-item:hover .product-img-wrap { background: #eeeef0; }
+    .product-name { color: #111; padding: 0 2px; }
+    .product-meta { color: #8a8a8a; padding: 0 2px; }
+    .product-price { color: #111; padding: 0 0 0 2px; }
+    .price-orig-strike { color: #b0b0b0; }
     .product-foot {
       display: flex; align-items: center; justify-content: space-between;
-      gap: 8px; margin-top: auto;
+      gap: 8px; margin-top: auto; padding-top: 2px;
     }
     .product-foot .product-price { margin-bottom: 0; }
     .add-round {
@@ -857,12 +870,8 @@
     }
     .add-round:hover:not(:disabled) { background: #e6ac00; }
     .add-round:active:not(:disabled) { transform: scale(.88); }
-    .add-round:disabled { background: #262626; color: #666; box-shadow: none; cursor: not-allowed; }
+    .add-round:disabled { background: #ececec; color: #bbb; box-shadow: none; cursor: not-allowed; }
     .add-round.added { background: #22c55e; color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,.35); }
-    .product-name { color: #f0f0f0; }
-    .product-meta { color: #888; }
-    .product-price { color: #fff; }
-    .price-orig-strike { color: #777; }
     .unit-label { color: #888; }
     .unit-select { background: #161616; border-color: #2a2a2a; color: #ddd; }
     .unit-select:focus { border-color: #555; }

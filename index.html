@@ -1068,8 +1068,13 @@ const HDR = { 'Content-Type': 'application/json', 'X-Storefront-Key': STOREFRONT
 const ACCENT = '#E8A020', AD = '#C8880A'
 
 const som   = n => { const v = Math.round(+n||0); return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' so\'m' }
-// Og'irlik/o'lchov birlikmi (kg, gramm) — kasr miqdor bilan sotiladi
-const isWeightUnit = name => /kilogram|kilogramm|gramm|\bkg\b|\bg\b/i.test((name||'').trim())
+// Kasr miqdor bilan sotiladigan birlikmi (kg, gramm, m², metr) — masalan 2.3 m²
+const isWeightUnit = name => {
+  const s = (name || '').trim().toLowerCase()
+  return /kilogram|kilogramm|gramm|\bkg\b|\bg\b/.test(s)                                   // og'irlik
+      || /kvadrat|квадрат|\bm2\b|\bм2\b|m²|м²|m\^2|\bkv\.?\s?m\b|\bkvm\b|square|sqm/.test(s) // maydon (m²)
+      || /pogon|погон|\bmetr\b|\bметр\b|\bm\b|\bм\b|running/.test(s)                        // uzunlik (metr)
+}
 // Miqdorni ko'rsatish: butun bo'lsa "2", kasr bo'lsa "0.5"
 const fmtQty = n => Number.isInteger(+n) ? String(+n) : String(+(+n).toFixed(3))
 const PM_LABELS = { cash:'Naqd', card:'Karta', transfer:"O'tkazma", credit:'Nasiya', mixed:'Aralash', click:'Click', payme:'Payme', uzum:'Uzum', humo:'Humo', uzcard:'UzCard', installment:"Bo'lib to'lash", exchange_credit:'Ayirboshlash' }

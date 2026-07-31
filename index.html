@@ -888,6 +888,13 @@
     .qs-btn:active:not(:disabled) { background: rgba(0,0,0,.16); }
     .qs-btn:disabled { color: rgba(0,0,0,.28); cursor: not-allowed; }
     .qs-num { min-width: 26px; text-align: center; font-size: 15px; font-weight: 800; color: #000; }
+    .qs-num-input {
+      width: 34px; text-align: center; font-size: 15px; font-weight: 800; color: #000;
+      background: transparent; border: none; outline: none; padding: 0;
+      -moz-appearance: textfield; appearance: textfield;
+    }
+    .qs-num-input::-webkit-outer-spin-button,
+    .qs-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .product-foot .product-price { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .unit-label { color: #888; }
     .unit-select { background: #161616; border-color: #2a2a2a; color: #ddd; }
@@ -925,6 +932,15 @@
     .detail-qty-btn { color: #bbb; }
     .detail-qty-btn:hover { background: #242424; }
     .detail-qty-num { color: #fff; border-color: #2a2a2a; }
+    .detail-qty-num-input {
+      width: 56px; height: 100%; text-align: center;
+      font-size: 16px; font-weight: 700; color: #fff;
+      background: transparent; border: none;
+      border-left: 2px solid #2a2a2a; border-right: 2px solid #2a2a2a;
+      outline: none; -moz-appearance: textfield; appearance: textfield;
+    }
+    .detail-qty-num-input::-webkit-outer-spin-button,
+    .detail-qty-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .detail-qty-input { color: #fff; }
     .vc-name { color: #e5e5e5; }
     .vc-stock { color: #888; }
@@ -1220,9 +1236,18 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
                   <span className="detail-qty-unit">${unit?.unit_name||'kg'}</span>
                 </div>`
               : html`<div className="detail-qty-wrap">
-                  <button className="detail-qty-btn" onClick=${()=>setQty(q=>Math.max(1,q-1))}>−</button>
-                  <span className="detail-qty-num">${qty}</span>
-                  <button className="detail-qty-btn" onClick=${()=>setQty(q=>maxQty===Infinity?q+1:Math.min(q+1,maxQty-inCart))}>+</button>
+                  <button className="detail-qty-btn" onClick=${()=>setQty(q=>Math.max(1,(+q||1)-1))}>−</button>
+                  <input type="text" inputMode="numeric" className="detail-qty-num-input"
+                    value=${qty}
+                    onInput=${e=>{
+                      let v = e.target.value.replace(/[^0-9]/g,'')
+                      if (v==='') { setQty(''); return }
+                      let n = parseInt(v,10)
+                      if (maxQty!==Infinity) n = Math.min(n, Math.max(1, maxQty-inCart))
+                      setQty(n)
+                    }}
+                    onBlur=${()=>{ if(!qty || +qty<1) setQty(1) }}/>
+                  <button className="detail-qty-btn" onClick=${()=>setQty(q=>maxQty===Infinity?(+q||1)+1:Math.min((+q||1)+1,maxQty-inCart))}>+</button>
                 </div>`}
             <button ref=${addRef} className=${'detail-add-btn'+(added?' btn-added':'')} onClick=${handleAdd} disabled=${out}>
               ${added
@@ -1302,6 +1327,25 @@ function BottomNav({ active, count, cartIconRef, onHome, onSearch, onCart, onDra
     </nav>`
 }
 
+// ── StepperInput — kartadagi sonni qo'lda yozish ──────────────────────────
+function StepperInput({ value, max, onCommit }) {
+  const [t, setT] = useState(String(value))
+  useEffect(() => { setT(String(value)) }, [value])
+  const onType = raw => {
+    const v = raw.replace(/[^0-9]/g, '')
+    setT(v)
+    if (v === '') return
+    let n = parseInt(v, 10)
+    if (max && max !== Infinity) n = Math.min(n, max)
+    if (n >= 1) onCommit(n)
+  }
+  return html`<input type="text" inputMode="numeric" className="qs-num-input"
+    value=${t}
+    onClick=${e=>e.stopPropagation()}
+    onInput=${e=>onType(e.target.value)}
+    onBlur=${()=>{ if (t === '' || +t < 1) setT(String(value)) }}/>`
+}
+
 // ── ProductItem ────────────────────────────────────────────────────────
 function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail }) {
   const hasVariants = !!(p.has_variants && p.variants?.length)
@@ -1377,7 +1421,7 @@ function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail }) {
         ${(!hasVariants && !isWeight && inCart > 0)
           ? html`<div className="qty-stepper" onClick=${e=>e.stopPropagation()}>
               <button className="qs-btn" onClick=${()=>onSetQty(cartKey, inCart-1)}>−</button>
-              <span className="qs-num">${inCart}</span>
+              <${StepperInput} value=${inCart} max=${maxQty} onCommit=${n=>onSetQty(cartKey, n)}/>
               <button className="qs-btn" onClick=${()=>onSetQty(cartKey, inCart+1)} disabled=${inCart>=maxQty}>+</button>
             </div>`
           : html`<button ref=${addBtnRef}

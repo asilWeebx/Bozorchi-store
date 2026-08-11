@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
   <title>Kafelbaraka.uz online-store</title>
   <link rel="icon" href="data:,">
+  <!-- Xarita (yetkazish joyini belgilash) — OpenStreetMap, kalitsiz -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>document.write('<script src="./config.js?_='+Date.now()+'"><\/script>')</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1081,6 +1084,16 @@ const PM_LABELS = { cash:'Naqd', card:'Karta', transfer:"O'tkazma", credit:'Nasi
 const pmLabel = m => PM_LABELS[m] || (m || '—')
 const media = u => !u ? '' : u.startsWith('http') ? u : API_URL.replace(/\/api\/?$/,'') + u
 const api   = async (p,o={}) => { const r=await fetch(API_URL+p,{...o,headers:HDR}); if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error||'Xatolik'); return r.json() }
+// Koordinatani manzil matniga (OpenStreetMap Nominatim — bepul, kalitsiz).
+// Javob kelmasa null — oqim to'xtamaydi (kuryer koordinata bo'yicha boradi).
+const reverseGeocode = async (lat, lng) => {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=uz,ru`, { headers:{ 'Accept':'application/json' } })
+    if (!r.ok) return null
+    const d = await r.json()
+    return d.display_name || null
+  } catch { return null }
+}
 
 // ── SVG Icons ──────────────────────────────────────────────────────────
 const Ic = ({size=20,sw=1.8,children}) => html`<svg width=${size} height=${size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth=${sw} strokeLinecap="round" strokeLinejoin="round">${children}</svg>`
@@ -1550,16 +1563,99 @@ function CartSheet({ open, onClose, items, setQty, remove, total, onCheckout }) 
     </div>`
 }
 
+// ── Xarita picker (Leaflet + OSM) ────────────────────────────────────────
+function MapPicker({ open, initial, onPick, onClose }) {
+  const boxRef = useRef(null)
+  const mapRef = useRef(null)
+  const ctrRef = useRef(initial && initial.lat != null ? initial : { lat:41.311081, lng:69.240562 })
+  const [addr, setAddr] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!open || !window.L || !boxRef.current) return
+    const L = window.L
+    const c = ctrRef.current
+    const map = L.map(boxRef.current, { attributionControl:false }).setView([c.lat, c.lng], 16)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(map)
+    mapRef.current = map
+    let t
+    const resolve = async () => {
+      const p = map.getCenter()
+      ctrRef.current = { lat:p.lat, lng:p.lng }
+      setLoading(true)
+      const a = await reverseGeocode(p.lat, p.lng)
+      setAddr(a); setLoading(false)
+    }
+    map.on('moveend', () => { clearTimeout(t); t = setTimeout(resolve, 350) })
+    setTimeout(() => { map.invalidateSize(); resolve() }, 120)
+    return () => { clearTimeout(t); map.remove(); mapRef.current = null }
+  }, [open])
+
+  if (!open) return null
+  const locate = () => {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      p => mapRef.current && mapRef.current.setView([p.coords.latitude, p.coords.longitude], 17),
+      () => {}, { enableHighAccuracy:true, timeout:15000 })
+  }
+  return html`
+    <div style=${{position:'fixed',inset:0,zIndex:1000,background:'#000'}}>
+      <div ref=${boxRef} style=${{position:'absolute',inset:0}}></div>
+      <div style=${{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-100%)',pointerEvents:'none',fontSize:42,zIndex:500}}>📍</div>
+      <button onClick=${onClose} style=${{position:'absolute',top:16,left:16,zIndex:600,width:44,height:44,borderRadius:22,border:'none',background:'#fff',fontSize:18,cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.3)'}}>✕</button>
+      <button onClick=${locate} style=${{position:'absolute',right:16,bottom:190,zIndex:600,width:46,height:46,borderRadius:23,border:'none',background:'#fff',fontSize:20,cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.3)'}}>🎯</button>
+      <div style=${{position:'absolute',left:0,right:0,bottom:0,background:'#fff',borderRadius:'18px 18px 0 0',padding:'18px 20px calc(18px + env(safe-area-inset-bottom))',zIndex:600}}>
+        <div style=${{fontSize:11,fontWeight:700,color:'#888',letterSpacing:.6,marginBottom:8}}>TANLANGAN JOY</div>
+        <div style=${{background:'#f4f4f4',borderRadius:12,padding:14,fontSize:14,fontWeight:700,color:'#222',marginBottom:14,lineHeight:1.4}}>${loading ? 'Aniqlanmoqda...' : (addr || 'Manzil aniqlanmadi (koordinata saqlanadi)')}</div>
+        <button onClick=${()=>onPick(ctrRef.current.lat, ctrRef.current.lng, addr)} style=${{width:'100%',height:52,border:'none',borderRadius:14,background:ACCENT,color:'#fff',fontSize:16,fontWeight:800,cursor:'pointer'}}>Shu yerni tanlash</button>
+      </div>
+    </div>`
+}
+
 // ── Checkout ─────────────────────────────────────────────────────────────
 function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
   const [name,  setName]  = useState(customer?.name||'')
   const [phone, setPhone] = useState(customer?.phone||'')
-  const [err,   setErr]   = useState('')
+  const [delivery, setDelivery] = useState('courier')
+  const [payment,  setPayment]  = useState('cash')
+  const [address,  setAddress]  = useState('')
+  const [landmark, setLandmark] = useState('')
+  const [lat, setLat] = useState(null)
+  const [lng, setLng] = useState(null)
+  const [locating, setLocating] = useState(false)
+  const [mapOpen, setMapOpen] = useState(false)
+  const [err, setErr] = useState('')
+  const courier = delivery === 'courier'
   if (!open) return null
+
+  const locateMe = () => {
+    if (!navigator.geolocation) { setErr("Qurilma joylashuvni qo'llamaydi"); return }
+    setLocating(true); setErr('')
+    navigator.geolocation.getCurrentPosition(async p => {
+      setLat(p.coords.latitude); setLng(p.coords.longitude)
+      const a = await reverseGeocode(p.coords.latitude, p.coords.longitude)
+      if (a) setAddress(a)
+      setLocating(false)
+    }, () => { setLocating(false); setErr("Joylashuvga ruxsat berilmadi") }, { enableHighAccuracy:true, timeout:15000 })
+  }
+
   const go = () => {
     if (!name.trim() || !phone.trim()) { setErr('Ism va telefon raqami majburiy'); return }
-    onSubmit({ customer_name: name.trim(), phone: phone.trim() })
+    if (courier && !address.trim() && lat == null) { setErr('Manzil kiriting yoki xaritadan belgilang'); return }
+    onSubmit({
+      customer_name: name.trim(), phone: phone.trim(),
+      delivery_type: delivery, payment_method: payment,
+      ...(courier ? { address: address.trim(), landmark: landmark.trim() } : {}),
+      ...(courier && lat != null ? { latitude: lat, longitude: lng } : {}),
+    })
   }
+
+  const seg = (v,label) => html`<button onClick=${()=>setDelivery(v)} style=${{flex:1,height:48,borderRadius:12,border:'1.5px solid '+(delivery===v?ACCENT:'#2a2a2a'),background:delivery===v?ACCENT:'transparent',color:delivery===v?'#fff':'#ddd',fontSize:15,fontWeight:800,cursor:'pointer'}}>${label}</button>`
+  const payCard = (v,title,sub) => html`<button onClick=${()=>setPayment(v)} style=${{display:'flex',alignItems:'center',gap:12,width:'100%',textAlign:'left',padding:14,borderRadius:12,border:'1.5px solid '+(payment===v?ACCENT:'#2a2a2a'),background:'#161616',color:'#fff',cursor:'pointer'}}>
+    <div style=${{flex:1}}><div style=${{fontSize:15,fontWeight:800}}>${title}</div><div style=${{fontSize:12,color:'#999',marginTop:2}}>${sub}</div></div>
+    <div style=${{width:20,height:20,borderRadius:10,border:'2px solid '+(payment===v?ACCENT:'#555'),background:payment===v?ACCENT:'transparent'}}></div>
+  </button>`
+
   return html`
     <div className="overlay-bg fade-in">
       <div className="overlay-dim" onClick=${onClose}></div>
@@ -1570,7 +1666,36 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
           <button className="close-btn" onClick=${onClose}><${IX}/></button>
         </div>
         <div style=${{padding:'0 20px 36px',display:'flex',flexDirection:'column',gap:14,marginTop:8}}>
-          <p style=${{fontSize:13,color:'#aaa',marginBottom:4}}>Telefon raqamingizni qoldiring — do'kon siz bilan bog'lanadi.</p>
+
+          <div>
+            <div className="form-label" style=${{marginBottom:8}}>YETKAZIB BERISH</div>
+            <div style=${{display:'flex',gap:10}}>${seg('courier','Kuryer')} ${seg('pickup','Olib ketaman')}</div>
+          </div>
+
+          ${courier && html`
+            <div className="form-field">
+              <label className="form-label">Manzil</label>
+              <input className="form-input" value=${address} onInput=${e=>setAddress(e.target.value)} placeholder="Ko'cha, uy, xonadon"/>
+            </div>
+            <div className="form-field">
+              <label className="form-label">Mo'ljal (ixtiyoriy)</label>
+              <input className="form-input" value=${landmark} onInput=${e=>setLandmark(e.target.value)} placeholder="Masalan: maktab yonida"/>
+            </div>
+            <div style=${{display:'flex',gap:10}}>
+              <button onClick=${locateMe} disabled=${locating} style=${{flex:1,height:46,borderRadius:12,border:'1.5px solid #2a2a2a',background:'transparent',color:'#ddd',fontSize:14,fontWeight:700,cursor:'pointer'}}>${locating?'Aniqlanmoqda...':'📍 Meni topish'}</button>
+              <button onClick=${()=>setMapOpen(true)} style=${{flex:1,height:46,borderRadius:12,border:'1.5px solid '+(lat!=null?ACCENT:'#2a2a2a'),background:lat!=null?ACCENT:'transparent',color:lat!=null?'#fff':'#ddd',fontSize:14,fontWeight:700,cursor:'pointer'}}>🗺️ Xaritadan belgilash</button>
+            </div>
+            ${lat!=null && html`<div style=${{fontSize:12,color:'#4ade80',marginTop:-4}}>✓ Joylashuv belgilandi</div>`}
+          `}
+
+          <div>
+            <div className="form-label" style=${{marginBottom:8}}>TO'LOV USULI</div>
+            <div style=${{display:'flex',flexDirection:'column',gap:10}}>
+              ${payCard('cash','Naqd pul',"Kuryerga qo'lma-qo'l topshirasiz")}
+              ${payCard('card','Karta orqali','Operator karta raqamini yuboradi')}
+            </div>
+          </div>
+
           <div className="form-field">
             <label className="form-label">Ismingiz</label>
             <input className="form-input" value=${name} onInput=${e=>setName(e.target.value)} placeholder="Ism Familiya"/>
@@ -1579,16 +1704,20 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
             <label className="form-label">Telefon raqam</label>
             <input className="form-input" type="tel" value=${phone} onInput=${e=>setPhone(e.target.value)} placeholder="+998 90 000 00 00"/>
           </div>
+
           ${err && html`<div className="err-box">${err}</div>`}
           <div className="total-row">
             <span className="total-label">Jami</span>
             <span className="total-val">${som(total)}</span>
           </div>
           <button className="primary-btn" onClick=${go} disabled=${submitting}>
-            ${submitting ? 'Yuborilmoqda...' : 'Tasdiqlash va yuborish'}
+            ${submitting ? 'Yuborilmoqda...' : 'Buyurtmani tasdiqlash'}
           </button>
         </div>
       </div>
+      <${MapPicker} open=${mapOpen} initial=${lat!=null?{lat,lng}:null}
+        onPick=${(la,ln,a)=>{ setLat(la); setLng(ln); if(a) setAddress(a); setMapOpen(false) }}
+        onClose=${()=>setMapOpen(false)}/>
     </div>`
 }
 

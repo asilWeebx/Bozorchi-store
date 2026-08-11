@@ -1650,10 +1650,10 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
     })
   }
 
-  const seg = (v,label) => html`<button onClick=${()=>setDelivery(v)} style=${{flex:1,height:48,borderRadius:12,border:'1.5px solid '+(delivery===v?ACCENT:'#2a2a2a'),background:delivery===v?ACCENT:'transparent',color:delivery===v?'#fff':'#ddd',fontSize:15,fontWeight:800,cursor:'pointer'}}>${label}</button>`
-  const payCard = (v,title,sub) => html`<button onClick=${()=>setPayment(v)} style=${{display:'flex',alignItems:'center',gap:12,width:'100%',textAlign:'left',padding:14,borderRadius:12,border:'1.5px solid '+(payment===v?ACCENT:'#2a2a2a'),background:'#161616',color:'#fff',cursor:'pointer'}}>
-    <div style=${{flex:1}}><div style=${{fontSize:15,fontWeight:800}}>${title}</div><div style=${{fontSize:12,color:'#999',marginTop:2}}>${sub}</div></div>
-    <div style=${{width:20,height:20,borderRadius:10,border:'2px solid '+(payment===v?ACCENT:'#555'),background:payment===v?ACCENT:'transparent'}}></div>
+  const seg = (v,label) => html`<button onClick=${()=>setDelivery(v)} style=${{flex:1,height:48,borderRadius:12,border:'1.5px solid '+(delivery===v?ACCENT:'rgba(150,150,150,.35)'),background:delivery===v?ACCENT:'transparent',color:delivery===v?'#fff':'inherit',fontSize:15,fontWeight:800,cursor:'pointer'}}>${label}</button>`
+  const payCard = (v,title,sub) => html`<button onClick=${()=>setPayment(v)} style=${{display:'flex',alignItems:'center',gap:12,width:'100%',textAlign:'left',padding:14,borderRadius:12,border:(payment===v?'2px solid '+ACCENT:'1.5px solid rgba(150,150,150,.3)'),background:'transparent',color:'inherit',cursor:'pointer'}}>
+    <div style=${{flex:1}}><div style=${{fontSize:15,fontWeight:800}}>${title}</div><div style=${{fontSize:12,color:'rgba(150,150,150,.95)',marginTop:2}}>${sub}</div></div>
+    <div style=${{width:20,height:20,borderRadius:10,border:'2px solid '+(payment===v?ACCENT:'rgba(150,150,150,.5)'),background:payment===v?ACCENT:'transparent',flexShrink:0}}></div>
   </button>`
 
   return html`
@@ -1665,7 +1665,7 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
           <div className="sheet-title">Buyurtmani rasmiylashtirish</div>
           <button className="close-btn" onClick=${onClose}><${IX}/></button>
         </div>
-        <div style=${{padding:'0 20px 36px',display:'flex',flexDirection:'column',gap:14,marginTop:8}}>
+        <div style=${{padding:'0 20px 36px',display:'flex',flexDirection:'column',gap:14,marginTop:8,flex:1,overflowY:'auto',minHeight:0}}>
 
           <div>
             <div className="form-label" style=${{marginBottom:8}}>YETKAZIB BERISH</div>
@@ -1682,10 +1682,10 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
               <input className="form-input" value=${landmark} onInput=${e=>setLandmark(e.target.value)} placeholder="Masalan: maktab yonida"/>
             </div>
             <div style=${{display:'flex',gap:10}}>
-              <button onClick=${locateMe} disabled=${locating} style=${{flex:1,height:46,borderRadius:12,border:'1.5px solid #2a2a2a',background:'transparent',color:'#ddd',fontSize:14,fontWeight:700,cursor:'pointer'}}>${locating?'Aniqlanmoqda...':'📍 Meni topish'}</button>
-              <button onClick=${()=>setMapOpen(true)} style=${{flex:1,height:46,borderRadius:12,border:'1.5px solid '+(lat!=null?ACCENT:'#2a2a2a'),background:lat!=null?ACCENT:'transparent',color:lat!=null?'#fff':'#ddd',fontSize:14,fontWeight:700,cursor:'pointer'}}>🗺️ Xaritadan belgilash</button>
+              <button onClick=${locateMe} disabled=${locating} style=${{flex:1,height:46,borderRadius:12,border:'1.5px solid rgba(150,150,150,.35)',background:'transparent',color:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}}>${locating?'Aniqlanmoqda...':'📍 Meni topish'}</button>
+              <button onClick=${()=>setMapOpen(true)} style=${{flex:1,height:46,borderRadius:12,border:'1.5px solid '+(lat!=null?ACCENT:'rgba(150,150,150,.35)'),background:lat!=null?ACCENT:'transparent',color:lat!=null?'#fff':'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}}>🗺️ Xaritadan belgilash</button>
             </div>
-            ${lat!=null && html`<div style=${{fontSize:12,color:'#4ade80',marginTop:-4}}>✓ Joylashuv belgilandi</div>`}
+            ${lat!=null && html`<div style=${{fontSize:12,color:'#16a34a',fontWeight:700,marginTop:-4}}>✓ Joylashuv belgilandi</div>`}
           `}
 
           <div>

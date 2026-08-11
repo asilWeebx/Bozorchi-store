@@ -1706,7 +1706,9 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
           </div>
 
           ${err && html`<div className="err-box">${err}</div>`}
-          <div className="total-row">
+        </div>
+        <div style=${{padding:'12px 20px calc(16px + env(safe-area-inset-bottom))',borderTop:'1px solid rgba(150,150,150,.2)',flexShrink:0,background:'inherit'}}>
+          <div className="total-row" style=${{marginBottom:12}}>
             <span className="total-label">Jami</span>
             <span className="total-val">${som(total)}</span>
           </div>

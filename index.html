@@ -1071,6 +1071,22 @@ const HDR = { 'Content-Type': 'application/json', 'X-Storefront-Key': STOREFRONT
 const ACCENT = '#E8A020', AD = '#C8880A'
 
 const som   = n => { const v = Math.round(+n||0); return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' so\'m' }
+// Valyutaga mos narx: USD → "$28", aks holda → "28 000 so'm"
+const money = (n, cur) => {
+  if (!cur || cur === '' || cur === 'UZS') return som(n)
+  const v = Math.round((+n||0)*100)/100
+  let i, d
+  if (Number.isInteger(v)) { i = v.toString(); d = '' } else { [i, d] = v.toFixed(2).split('.') }
+  i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  return (cur === 'USD' ? '$' : cur + ' ') + i + (d ? '.' + d : '')
+}
+// Savat jami — valyuta bo'yicha guruhlab ("$52  +  300 000 so'm")
+const groupTotal = (items) => {
+  const t = {}
+  ;(items || []).forEach(it => { const c = it.currency || ''; t[c] = (t[c] || 0) + (it.cur_price ?? it.price) * it.qty })
+  const e = Object.entries(t)
+  return e.length ? e.map(([c, v]) => money(v, c)).join('  +  ') : som(0)
+}
 // Kasr miqdor bilan sotiladigan birlikmi (kg, gramm, m², metr) — masalan 2.3 m²
 const isWeightUnit = name => {
   const s = (name || '').trim().toLowerCase()
@@ -1145,6 +1161,9 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
 
   const displayPrice    = hasVariants ? (selVariant?.price ?? 0) : (unit?.price ?? 0)
   const displayOrigPrice = hasVariants ? (selVariant?.original_price ?? null) : (unit?.original_price ?? null)
+  const dispCur = hasVariants ? (selVariant?.currency ?? '') : (unit?.currency ?? '')
+  const dispVal = hasVariants ? (selVariant?.cur_price ?? displayPrice) : (unit?.cur_price ?? displayPrice)
+  const dispOrigVal = hasVariants ? (selVariant?.cur_original_price ?? null) : (unit?.cur_original_price ?? null)
   const mult   = unit?.multiplier || 1
   const isWeight = !hasVariants && isWeightUnit(unit?.unit_name)  // kg tovar — kasr miqdor
   const maxQty = hasVariants
@@ -1194,8 +1213,8 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
           ${p.category_name && html`<div className="detail-cat">${p.category_name}</div>`}
           <h1 className="detail-name">${p.name}</h1>
           <div className="detail-price">
-            ${displayOrigPrice && html`<span className="price-orig-strike">${som(displayOrigPrice)}</span>`}
-            ${som(displayPrice)}
+            ${dispOrigVal && html`<span className="price-orig-strike">${money(dispOrigVal, dispCur)}</span>`}
+            ${money(dispVal, dispCur)}
             ${p.discount_percent > 0 && html`<span className="disc-badge">−${Math.round(p.discount_percent)}%</span>`}
           </div>
 
@@ -1208,8 +1227,8 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
                   className=${'detail-unit-chip variant-chip'+(variantId===v.id?' active':'')+(v.in_stock?'':' unavailable')}
                   onClick=${()=>{ if(v.in_stock){setVariantId(v.id);setQty(1)} }}>
                   <span className="vc-name">${v.name}</span>
-                  ${v.original_price != null && html`<span className="vc-orig">${som(v.original_price)}</span>`}
-                  <span className="vc-price">${som(v.price)}</span>
+                  ${v.cur_original_price != null && html`<span className="vc-orig">${money(v.cur_original_price, v.currency)}</span>`}
+                  <span className="vc-price">${money(v.cur_price ?? v.price, v.currency)}</span>
                   ${v.stock!=null ? html`<span className="vc-stock">${Math.floor(v.stock)} ta</span>` : null}
                   ${!v.in_stock ? html`<span className="vc-out">Tugadi</span>` : null}
                 </button>`)}
@@ -1392,6 +1411,10 @@ function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail }) {
   const displayOrigPrice = hasVariants
     ? (p.variants[0]?.original_price ?? null)
     : (unit?.original_price ?? null)
+  // Valyuta (kiritilgan) + o'sha valyutadagi qiymat
+  const dispCur = hasVariants ? (p.variants[0]?.currency ?? '') : (unit?.currency ?? '')
+  const dispVal = hasVariants ? (p.variants[0]?.cur_price ?? displayPrice) : (unit?.cur_price ?? displayPrice)
+  const dispOrigVal = hasVariants ? (p.variants[0]?.cur_original_price ?? null) : (unit?.cur_original_price ?? null)
 
   const handleAdd = (e) => {
     e.stopPropagation()
@@ -1432,8 +1455,8 @@ function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail }) {
       <!-- Foot: price + round add button -->
       <div className="product-foot">
         <div className="product-price">
-          ${displayOrigPrice != null && html`<span className="price-orig-strike">${hasVariants ? 'dan '+som(displayOrigPrice) : som(displayOrigPrice)}</span>`}
-          ${hasVariants ? 'dan '+som(displayPrice) : som(displayPrice)}
+          ${dispOrigVal != null && html`<span className="price-orig-strike">${hasVariants ? 'dan '+money(dispOrigVal, dispCur) : money(dispOrigVal, dispCur)}</span>`}
+          ${hasVariants ? 'dan '+money(dispVal, dispCur) : money(dispVal, dispCur)}
           ${p.discount_percent > 0 && html`<span className="disc-badge">−${Math.round(p.discount_percent)}%</span>`}
         </div>
         ${(!hasVariants && !isWeight && inCart > 0)
@@ -1525,8 +1548,8 @@ function CartSheet({ open, onClose, items, setQty, remove, total, onCheckout }) 
                   </div>
                   <div className="cart-info-new">
                     <div className="cart-name-new clamp2">${it.name}${it.variant_name ? ' · '+it.variant_name : ''}</div>
-                    <div className="cart-price-new">${som(it.price * it.qty)}</div>
-                    <div className="cart-unit-new">${som(it.price)} × ${fmtQty(it.qty)} ${it.unit_name}</div>
+                    <div className="cart-price-new">${money((it.cur_price ?? it.price) * it.qty, it.currency)}</div>
+                    <div className="cart-unit-new">${money(it.cur_price ?? it.price, it.currency)} × ${fmtQty(it.qty)} ${it.unit_name}</div>
                   </div>
                   ${it.weight
                     ? html`<div className="cart-qty-ctrl">
@@ -1551,7 +1574,7 @@ function CartSheet({ open, onClose, items, setQty, remove, total, onCheckout }) 
         <div className="cart-footer-new">
           <div className="cart-total-card">
             <span className="cart-total-lbl">Jami summa</span>
-            <span className="cart-total-val">${som(total)}</span>
+            <span className="cart-total-val">${groupTotal(items)}</span>
           </div>
           <button className="cart-checkout-btn" disabled=${items.length===0}
             onClick=${()=>{onClose();onCheckout()}}>
@@ -1613,7 +1636,7 @@ function MapPicker({ open, initial, onPick, onClose }) {
 }
 
 // ── Checkout ─────────────────────────────────────────────────────────────
-function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
+function Checkout({ open, onClose, total, totalStr, onSubmit, submitting, customer }) {
   const [name,  setName]  = useState(customer?.name||'')
   const [phone, setPhone] = useState(customer?.phone||'')
   const [delivery, setDelivery] = useState('courier')
@@ -1710,7 +1733,7 @@ function Checkout({ open, onClose, total, onSubmit, submitting, customer }) {
         <div style=${{padding:'12px 20px calc(16px + env(safe-area-inset-bottom))',borderTop:'1px solid rgba(150,150,150,.2)',flexShrink:0,background:'inherit'}}>
           <div className="total-row" style=${{marginBottom:12}}>
             <span className="total-label">Jami</span>
-            <span className="total-val">${som(total)}</span>
+            <span className="total-val">${totalStr || som(total)}</span>
           </div>
           <button className="primary-btn" onClick=${go} disabled=${submitting}>
             ${submitting ? 'Yuborilmoqda...' : 'Buyurtmani tasdiqlash'}
@@ -2035,7 +2058,7 @@ function App() {
     setCart(c => {
       const ex = c.find(x=>x.key===key)
       if (ex) { if(ex.qty>=max) return c; return c.map(x=>x.key===key?{...x,qty:Math.min(x.qty+qty,max)}:x) }
-      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',weight,name:p.name,price:unit?.price,qty:Math.min(qty,max),maxQty:max,image:p.image}]
+      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',weight,name:p.name,price:unit?.price,currency:unit?.currency||'',cur_price:unit?.cur_price ?? unit?.price,qty:Math.min(qty,max),maxQty:max,image:p.image}]
     })
     _orbBounce(fromEl)
   }
@@ -2047,7 +2070,7 @@ function App() {
     setCart(c => {
       const ex = c.find(x=>x.key===key)
       if (ex) return c.map(x=>x.key===key?{...x,qty:Math.min(x.qty+qty,max)}:x)
-      return [...c, {key,product_id:p.id,unit_id:null,variant_id:variant.id,variant_name:variant.name,unit_name:'dona',name:p.name,price:variant.price,qty,maxQty:max===Infinity?9999:max,image:p.image}]
+      return [...c, {key,product_id:p.id,unit_id:null,variant_id:variant.id,variant_name:variant.name,unit_name:'dona',name:p.name,price:variant.price,currency:variant.currency||'',cur_price:variant.cur_price ?? variant.price,qty,maxQty:max===Infinity?9999:max,image:p.image}]
     })
     _orbBounce(fromEl)
   }
@@ -2166,7 +2189,7 @@ function App() {
 
     <${Checkout}
       open=${chkOpen} onClose=${()=>setChkOpen(false)}
-      total=${total} onSubmit=${submitOrder} submitting=${subbing} customer=${customer}/>
+      total=${total} totalStr=${groupTotal(cart)} onSubmit=${submitOrder} submitting=${subbing} customer=${customer}/>
 
     <${Login} open=${loginOpen} onClose=${()=>setLoginOpen(false)} onLogin=${doLogin}/>
 

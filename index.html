@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-  <title>Kafelbaraka.uz online-store</title>
-  <link rel="icon" href="data:,">
+  <title>Kafelbaraka.uz — kafel va plitkalar onlayn do'koni</title>
+  <meta name="description" content="Kafelbaraka.uz — kafel, plitka va zina mahsulotlarini onlayn tanlash va buyurtma qilish."/>
+  <meta name="theme-color" content="#0b0b0b"/>
+  <link rel="icon" type="image/png" href="./logo2.png">
   <!-- Xarita (yetkazish joyini belgilash) — OpenStreetMap, kalitsiz -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1056,6 +1058,162 @@
       .portal-overlay .portal-handle { display: none; }
       .portal-overlay .portal-head { padding-top: 22px; }
     }
+
+    /* ── Storefront discovery features ───────────────────── */
+    .banner-wrap {
+      width: min(1400px, calc(100% - 48px));
+      margin: 20px auto 8px;
+    }
+    .banner-viewport {
+      position: relative; overflow: hidden; border-radius: 22px;
+      background: #141414; aspect-ratio: 3 / 1;
+      min-height: 220px; max-height: 430px;
+      box-shadow: 0 16px 44px rgba(0,0,0,.32);
+    }
+    .banner-track { display: flex; width: 100%; height: 100%; transition: transform .55s cubic-bezier(.22,.61,.36,1); }
+    .banner-slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; }
+    .banner-slide::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg,rgba(5,5,5,.86) 0%,rgba(5,5,5,.54) 38%,rgba(5,5,5,.08) 72%);
+      pointer-events: none;
+    }
+    .banner-slide.copy-right::after { background: linear-gradient(270deg,rgba(5,5,5,.86) 0%,rgba(5,5,5,.54) 38%,rgba(5,5,5,.08) 72%); }
+    .banner-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .banner-copy {
+      position: absolute; z-index: 2; left: clamp(24px,5vw,72px); top: 50%;
+      transform: translateY(-50%); width: min(520px,70%); color: #fff;
+    }
+    .banner-copy.right { left: auto; right: clamp(24px,5vw,72px); }
+    .banner-title { font-size: clamp(25px,3vw,45px); font-weight: 850; line-height: 1.08; letter-spacing: -.035em; }
+    .banner-subtitle { margin-top: 12px; font-size: clamp(13px,1.25vw,18px); line-height: 1.5; color: rgba(255,255,255,.78); }
+    .banner-dots { position: absolute; z-index: 3; left: 0; right: 0; bottom: 16px; display: flex; justify-content: center; gap: 7px; }
+    .banner-dot { width: 8px; height: 8px; border: 0; padding: 0; border-radius: 50%; background: rgba(255,255,255,.48); transition: width .2s, background .2s; }
+    .banner-dot.active { width: 26px; border-radius: 5px; background: #FBBC05; }
+    .banner-arrow {
+      position: absolute; z-index: 3; top: 50%; transform: translateY(-50%);
+      width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.28); border-radius: 50%;
+      background: rgba(10,10,10,.42); color: #fff; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); transition: background .15s, transform .15s;
+    }
+    .banner-arrow:hover { background: rgba(10,10,10,.72); transform: translateY(-50%) scale(1.04); }
+    .banner-arrow.prev { left: 16px; }
+    .banner-arrow.next { right: 16px; }
+
+    .cat-sentinel { height: 1px; }
+    .cat-bar { transition: background .2s, box-shadow .2s, border-color .2s; }
+    .cat-bar-stuck {
+      background: rgba(11,11,11,.94); border-bottom-color: #282828;
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .cat-bar-inner { height: 58px; padding: 8px 24px; gap: 8px; justify-content: flex-start; }
+    .cat-chip-wrap {
+      flex: 0 0 auto; height: 40px; display: inline-flex; align-items: center;
+      background: #161616; border: 1px solid #2a2a2a; border-radius: 999px;
+      color: #b5b5b5; overflow: hidden; transition: background .15s,border-color .15s,color .15s;
+    }
+    .cat-chip-wrap:hover { border-color: #4a4a4a; color: #fff; }
+    .cat-chip-wrap.active { background: var(--accent); border-color: var(--accent); color: #000; }
+    .cat-chip-wrap > .cat-chip {
+      height: 100%; padding: 0 10px 0 14px; border: 0; border-radius: 0;
+      background: transparent !important; color: inherit !important; box-shadow: none !important;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .cat-chip-wrap.no-children > .cat-chip { padding-right: 14px; }
+    .cat-chip-thumb { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .cat-chip-arrow-btn {
+      width: 34px; height: 100%; border: 0; border-left: 1px solid rgba(255,255,255,.1);
+      background: transparent; color: inherit; display: flex; align-items: center; justify-content: center;
+    }
+    .cat-chip-wrap.active .cat-chip-arrow-btn { border-left-color: rgba(0,0,0,.16); }
+    .cat-chip-arrow-btn svg { transition: transform .18s; }
+    .cat-chip-arrow-btn.open svg { transform: rotate(180deg); }
+    .cat-bar-sub { top: 122px; z-index: 98; }
+    .cat-bar-sub .cat-bar-inner { height: 50px; padding-top: 6px; padding-bottom: 6px; }
+    .cat-chip.cat-chip-sub { height: 34px; background: #161616; border-color: #2a2a2a; color: #aaa; }
+    .cat-chip.cat-chip-sub.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+    .cat-subdrop-overlay { position: fixed; inset: 0; z-index: 150; }
+    .cat-subdrop {
+      position: fixed; z-index: 151; width: min(300px,calc(100vw - 24px)); max-height: min(420px,65vh);
+      overflow-y: auto; padding: 8px; border: 1px solid #303030; border-radius: 16px;
+      background: rgba(20,20,20,.98); box-shadow: 0 20px 55px rgba(0,0,0,.48);
+      animation: popIn .18s ease both;
+    }
+    .cat-subdrop-item {
+      width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border: 0; border-radius: 10px; background: transparent;
+      color: #ddd; text-align: left; font-size: 13px; font-weight: 650;
+    }
+    .cat-subdrop-item:hover { background: #292929; color: #fff; }
+    .cat-subdrop-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+
+    .cat-sections { display: flex; flex-direction: column; gap: 54px; }
+    .cat-section { scroll-margin-top: 140px; }
+    .cat-section-title { color: #fff; font-size: 25px; line-height: 1.2; margin-bottom: 22px; letter-spacing: -.025em; }
+
+    .top-rail-wrap { margin: 0 0 42px; }
+    .top-rail-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .top-rail-head h2 { color: #fff; font-size: 21px; margin: 0; }
+    .top-rail-badge { color: #111; background: #FBBC05; border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 800; }
+    .top-rail { display: flex; gap: 16px; overflow-x: auto; padding: 3px 2px 12px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+    .top-rail-item { position: relative; flex: 0 0 210px; width: 210px; scroll-snap-align: start; }
+    .top-rail-item > .product-item { height: 100%; }
+    .top-rail-rank {
+      position: absolute; z-index: 2; top: 10px; left: 10px; pointer-events: none;
+      display: flex; align-items: center; gap: 4px; padding: 4px 8px 4px 6px;
+      border-radius: 7px; background: #111; color: #FBBC05; border: 1px solid rgba(251,188,5,.45);
+      font-size: 9px; font-weight: 900; letter-spacing: .05em;
+    }
+    .fallback-label { color: #fff; font-size: 20px; font-weight: 800; margin: 12px 0 22px; }
+
+    .drawer-cat-row { display: flex; align-items: stretch; }
+    .drawer-cat-row .drawer-cat-btn { flex: 1; min-width: 0; }
+    .dc-thumb { width: 34px; height: 34px; border-radius: 9px; object-fit: cover; flex-shrink: 0; margin-right: 11px; }
+    .dc-expand {
+      width: 48px; flex: 0 0 48px; border: 0; border-left: 1px solid #ececec;
+      background: transparent; color: #777; display: flex; align-items: center; justify-content: center;
+    }
+    .dc-expand:hover { background: #fff8f6; }
+    .dc-expand svg { transition: transform .18s; }
+    .dc-expand.open svg { transform: rotate(180deg); }
+    .dc-sub {
+      width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px;
+      padding: 9px 18px; border: 0; border-top: 1px solid #f0f0f0;
+      background: transparent; color: #555; text-align: left; font-size: 13px; font-weight: 600;
+    }
+    .dc-sub:hover, .dc-sub.dc-active { background: #fff7e0; color: #8a5a00; }
+    .dc-sub .dc-bar { width: 3px; height: 16px; border-radius: 2px; background: #ddd; }
+    .dc-sub.dc-active .dc-bar { background: var(--accent); }
+
+    .detail-similar { width: 100%; min-width: 0; max-width: 1040px; margin: 0 auto; padding: 8px 28px 110px; }
+    .detail-similar-title { color: #aaa; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 18px; padding-top: 26px; border-top: 1px solid #242424; }
+    .detail-similar-rail { display: flex; gap: 16px; width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; align-items: stretch; padding: 3px 2px 10px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+    .detail-similar-item { flex: 0 0 166px; width: 166px; scroll-snap-align: start; }
+    .detail-similar-item > .product-item { height: 100%; }
+
+    @media (max-width: 640px) {
+      .banner-wrap { width: calc(100% - 24px); margin-top: 12px; }
+      .banner-viewport { border-radius: 16px; aspect-ratio: 1.75 / 1; min-height: 190px; }
+      .banner-slide::after { background: linear-gradient(90deg,rgba(5,5,5,.88),rgba(5,5,5,.36) 74%,rgba(5,5,5,.12)); }
+      .banner-slide.copy-right::after { background: linear-gradient(270deg,rgba(5,5,5,.88),rgba(5,5,5,.36) 74%,rgba(5,5,5,.12)); }
+      .banner-copy { left: 22px; width: 72%; }
+      .banner-copy.right { left: auto; right: 22px; }
+      .banner-arrow { display: none; }
+      .banner-dots { bottom: 12px; }
+      .cat-bar-inner { height: 54px; padding: 7px 12px; }
+      .cat-bar-sub { top: 110px; }
+      .cat-chip-wrap { height: 38px; }
+      .cat-chip-wrap > .cat-chip { font-size: 12px; padding-left: 10px; }
+      .cat-chip-thumb { width: 26px; height: 26px; }
+      .cat-chip-arrow-btn { width: 31px; }
+      .cat-section { scroll-margin-top: 124px; }
+      .cat-section-title { font-size: 21px; margin-bottom: 16px; }
+      .cat-sections { gap: 42px; }
+      .top-rail-item { flex-basis: 158px; width: 158px; }
+      .detail-similar { padding: 4px 16px 100px; }
+      .detail-similar-item { flex-basis: 142px; width: 142px; }
+    }
   </style>
 </head>
 <body>
@@ -1070,16 +1228,28 @@ const { API_URL, STOREFRONT_KEY } = window.STORE_CONFIG
 const HDR = { 'Content-Type': 'application/json', 'X-Storefront-Key': STOREFRONT_KEY }
 const ACCENT = '#E8A020', AD = '#C8880A'
 
-const som   = n => { const v = Math.round(+n||0); return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' so\'m' }
-// Valyutaga mos narx: USD → "$28", aks holda → "28 000 so'm"
+// Tashkilotning bazaviy valyutasi /storefront/info/ orqali aniqlanadi.
+let BASE_CUR = 'UZS'
+const somRaw = n => { const v = Math.round(+n||0); return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' so\'m' }
+const normalizeCurrency = cur => {
+  const c = String(cur || '').trim().toUpperCase()
+  if (c === '$' || c === 'US$') return 'USD'
+  if (c === "SO'M" || c === 'SUM') return 'UZS'
+  return c
+}
+const resolveCurrency = (productCurrency, storeCurrency) =>
+  normalizeCurrency(productCurrency) || normalizeCurrency(storeCurrency) || BASE_CUR
+// Valyutaga mos narx: USD → "$28", UZS → "28 000 so'm".
 const money = (n, cur) => {
-  if (!cur || cur === '' || cur === 'UZS') return som(n)
+  cur = normalizeCurrency(cur) || BASE_CUR
+  if (cur === 'UZS') return somRaw(n)
   const v = Math.round((+n||0)*100)/100
   let i, d
   if (Number.isInteger(v)) { i = v.toString(); d = '' } else { [i, d] = v.toFixed(2).split('.') }
   i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
   return (cur === 'USD' ? '$' : cur + ' ') + i + (d ? '.' + d : '')
 }
+const som = n => money(n, BASE_CUR)
 // Savat jami — valyuta bo'yicha guruhlab ("$52  +  300 000 so'm")
 const groupTotal = (items) => {
   const t = {}
@@ -1098,8 +1268,70 @@ const isWeightUnit = name => {
 const fmtQty = n => Number.isInteger(+n) ? String(+n) : String(+(+n).toFixed(3))
 const PM_LABELS = { cash:'Naqd', card:'Karta', transfer:"O'tkazma", credit:'Nasiya', mixed:'Aralash', click:'Click', payme:'Payme', uzum:'Uzum', humo:'Humo', uzcard:'UzCard', installment:"Bo'lib to'lash", exchange_credit:'Ayirboshlash' }
 const pmLabel = m => PM_LABELS[m] || (m || '—')
-const media = u => !u ? '' : u.startsWith('http') ? u : API_URL.replace(/\/api\/?$/,'') + u
+const media = u => {
+  if (!u) return ''
+  u = String(u)
+  if (/^(https?:|data:|blob:)/.test(u) || u.startsWith('.')) return u
+  const base = API_URL.replace(/\/api\/?$/,'').replace(/\/$/,'')
+  return base + '/' + u.replace(/^\//,'')
+}
 const api   = async (p,o={}) => { const r=await fetch(API_URL+p,{...o,headers:HDR}); if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error||'Xatolik'); return r.json() }
+
+// Tavsiya va qidiruv yordamchilari.
+const isOutOfStock = p => (p.has_variants && p.variants?.length)
+  ? !p.in_stock
+  : (p.stock_type === 'tracked' && (p.stock ?? 0) <= 0)
+
+// Backenddagi `price` tashkilot bazaviy valyutasida saqlanadi; shu sababli
+// turli ko'rsatish valyutalaridagi mahsulotlarni ham bir xil o'lchovda solishtiramiz.
+const comparablePrice = p => p.units?.[0]?.price ?? p.variants?.[0]?.price ?? p.price ?? 0
+const similarProducts = (p, all, limit=10) => {
+  if (!p) return []
+  const sameCategory = [], sameParent = []
+  for (const item of all || []) {
+    if (item.id === p.id || isOutOfStock(item)) continue
+    if (p.category_id && item.category_id === p.category_id) sameCategory.push(item)
+    else if (p.category_parent_id && item.category_parent_id === p.category_parent_id) sameParent.push(item)
+  }
+  const basePrice = comparablePrice(p)
+  const byCloseness = list => [...list].sort((a,b) =>
+    Math.abs(comparablePrice(a)-basePrice) - Math.abs(comparablePrice(b)-basePrice))
+  return [...byCloseness(sameCategory), ...byCloseness(sameParent)].slice(0, limit)
+}
+
+const searchSuggestions = (query, all, limit=8) => {
+  const words = String(query || '').toLowerCase().trim().split(/\s+/).filter(Boolean)
+  if (!words.length) return []
+  const scored = []
+  for (const p of all || []) {
+    const haystack = [p.name, p.category_name, p.category_parent_name].filter(Boolean).join(' ').toLowerCase()
+    const score = words.reduce((sum, word) => sum + (haystack.includes(word) ? 1 : 0), 0)
+    if (score > 0) scored.push([p, score])
+  }
+  scored.sort((a,b) => b[1]-a[1] || comparablePrice(a[0])-comparablePrice(b[0]))
+  return scored.slice(0, limit).map(([p]) => p)
+}
+
+// Backendda banner yo'q bo'lsa shu mahalliy rasmlar ishlatiladi. Store info
+// kelmaguncha hech qanday vaqtinchalik banner ko'rsatilmaydi.
+const DEFAULT_BANNERS = [
+  {
+    image: './banners_img/bozorchi-modern-interior.jpg',
+    title: 'Uyingizga mos nafis kafellar',
+    subtitle: 'Katta format va zamonaviy kolleksiyalar',
+  },
+  {
+    image: './banners_img/bozorchi-tile-collection.jpg',
+    title: 'Har uslub uchun yangi tanlovlar',
+    subtitle: "Rang, faktura va o'lchamlarni bir joyda solishtiring",
+  },
+  {
+    image: './banners_img/bozorchi-delivery.jpg',
+    title: 'Tanlang. Buyurtma bering. Yetkazib beramiz.',
+    subtitle: "Ta'mirlash uchun kerakli mahsulotlar oson va qulay",
+    copyAlign: 'right',
+  },
+]
 // Koordinatani manzil matniga (OpenStreetMap Nominatim — bepul, kalitsiz).
 // Javob kelmasa null — oqim to'xtamaydi (kuryer koordinata bo'yicha boradi).
 const reverseGeocode = async (lat, lng) => {
@@ -1117,6 +1349,7 @@ const ISearch = ({s=20}) => html`<${Ic} size=${s}><circle cx="11" cy="11" r="8"/
 const ICart   = ({s=20}) => html`<${Ic} size=${s}><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></${Ic}>`
 const IUser   = ({s=20}) => html`<${Ic} size=${s}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></${Ic}>`
 const IX      = ({s=16}) => html`<${Ic} size=${s} sw=${2.2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></${Ic}>`
+const IChevronDown = ({s=12}) => html`<${Ic} size=${s} sw=${2.6}><path d="M6 9l6 6 6-6"/></${Ic}>`
 const ICaret  = ({s=12}) => html`<${Ic} size=${s} sw=${2.5}><polyline points="6 9 12 15 18 9"/></${Ic}>`
 const IBox    = ({s=40}) => html`<svg width=${s} height=${s} viewBox="0 0 24 24" fill="none" stroke="#d0d0d0" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`
 
@@ -1139,9 +1372,10 @@ function magicOrb(fromEl, toEl) {
 }
 
 // ── ProductDetail ─────────────────────────────────────────────────────
-function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
+function ProductDetail({ product, onClose, onAdd, onAddVariant, cart, allProducts, onSetQty, showImages, onSelect, storeCurrency }) {
   const p = product
   const hasVariants = !!(p.has_variants && p.variants?.length)
+  const similar = useMemo(() => similarProducts(p, allProducts||[], 10), [p, allProducts])
 
   const _firstInStock = hasVariants
     ? (p.variants.find(v => v.in_stock) || p.variants[0])
@@ -1161,7 +1395,7 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
 
   const displayPrice    = hasVariants ? (selVariant?.price ?? 0) : (unit?.price ?? 0)
   const displayOrigPrice = hasVariants ? (selVariant?.original_price ?? null) : (unit?.original_price ?? null)
-  const dispCur = hasVariants ? (selVariant?.currency ?? '') : (unit?.currency ?? '')
+  const dispCur = resolveCurrency(hasVariants ? selVariant?.currency : unit?.currency, storeCurrency)
   const dispVal = hasVariants ? (selVariant?.cur_price ?? displayPrice) : (unit?.cur_price ?? displayPrice)
   const dispOrigVal = hasVariants ? (selVariant?.cur_original_price ?? null) : (unit?.cur_original_price ?? null)
   const mult   = unit?.multiplier || 1
@@ -1203,7 +1437,7 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
       <div className="detail-body">
         <!-- Image -->
         <div className="detail-img-side">
-          ${p.image
+          ${showImages && p.image
             ? html`<img src=${media(p.image)} alt=${p.name}/>`
             : html`<${IBox} s=${100}/>`}
         </div>
@@ -1227,8 +1461,8 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
                   className=${'detail-unit-chip variant-chip'+(variantId===v.id?' active':'')+(v.in_stock?'':' unavailable')}
                   onClick=${()=>{ if(v.in_stock){setVariantId(v.id);setQty(1)} }}>
                   <span className="vc-name">${v.name}</span>
-                  ${v.cur_original_price != null && html`<span className="vc-orig">${money(v.cur_original_price, v.currency)}</span>`}
-                  <span className="vc-price">${money(v.cur_price ?? v.price, v.currency)}</span>
+                  ${v.cur_original_price != null && html`<span className="vc-orig">${money(v.cur_original_price, resolveCurrency(v.currency, storeCurrency))}</span>`}
+                  <span className="vc-price">${money(v.cur_price ?? v.price, resolveCurrency(v.currency, storeCurrency))}</span>
                   ${v.stock!=null ? html`<span className="vc-stock">${Math.floor(v.stock)} ta</span>` : null}
                   ${!v.in_stock ? html`<span className="vc-out">Tugadi</span>` : null}
                 </button>`)}
@@ -1297,13 +1531,32 @@ function ProductDetail({ product, onClose, onAdd, onAddVariant, cart }) {
           ${p.description && html`<p className="detail-desc">${p.description}</p>`}
         </div>
       </div>
+
+      ${similar.length > 0 && html`
+        <div className="detail-similar">
+          <div className="detail-similar-title">O'xshash mahsulotlar</div>
+          <div className="detail-similar-rail">
+            ${similar.map(sp => html`
+              <div className="detail-similar-item" key=${sp.id}>
+                <${ProductItem} p=${sp} onAdd=${onAdd} onSetQty=${onSetQty} cart=${cart}
+                  showImages=${showImages} onDetail=${onSelect} storeCurrency=${storeCurrency}/>
+              </div>`)}
+          </div>
+        </div>`}
     </div>`
 }
 
 // ── CategoryDrawer ────────────────────────────────────────────────────
-function CategoryDrawer({ open, onClose, cats, selCat, onSelect }) {
+function CategoryDrawer({ open, onClose, cats, selTop, selSub, onSelect, catImgs }) {
   const [q, setQ] = useState('')
-  const filtered = cats.filter(c => c.name.toLowerCase().includes(q.toLowerCase()))
+  const [exp, setExp] = useState({})
+  const ql = q.trim().toLowerCase()
+  const childrenOf = id => cats.filter(c => c.parentId === id)
+  const pick = (top, sub) => { onSelect(top, sub); onClose() }
+  let tops = cats.filter(c => c.parentId == null)
+  if (ql) tops = tops.filter(t =>
+    t.name.toLowerCase().includes(ql) || childrenOf(t.id).some(s => s.name.toLowerCase().includes(ql)))
+
   return html`<${React.Fragment}>
     <div className=${'drawer-overlay'+(open?' open':'')} onClick=${onClose}></div>
     <div className=${'cat-drawer'+(open?' open':'')}>
@@ -1315,20 +1568,51 @@ function CategoryDrawer({ open, onClose, cats, selCat, onSelect }) {
       </div>
       <div className="cat-drawer-list">
         <div className="drawer-cat-item">
-          <button className=${'drawer-cat-btn'+(selCat===null?' dc-active':'')}
-            onClick=${()=>{onSelect(null);onClose()}}>
+          <button className=${'drawer-cat-btn'+(selTop===null?' dc-active':'')}
+            onClick=${()=>pick(null,null)}>
             <span className="dc-label">Barchasi</span>
             <span className="dc-dot"></span>
           </button>
         </div>
-        ${filtered.map(c => html`
-          <div key=${c.id} className="drawer-cat-item">
-            <button className=${'drawer-cat-btn'+(selCat===c.id?' dc-active':'')}
-              onClick=${()=>{onSelect(c.id);onClose()}}>
-              <span className="dc-label">${c.name}</span>
-              <span className="dc-dot"></span>
-            </button>
-          </div>`)}
+        ${tops.map(t => {
+          const subs = childrenOf(t.id)
+          const parentActive = selTop===t.id && selSub==null
+          if (subs.length === 0) return html`
+            <div key=${t.id} className="drawer-cat-item">
+              <button className=${'drawer-cat-btn'+(parentActive?' dc-active':'')} onClick=${()=>pick(t.id,null)}>
+                ${catImgs[t.id] && html`<img className="dc-thumb" src=${media(catImgs[t.id])} alt=""/>`}
+                <span className="dc-label">${t.name}</span>
+                <span className="dc-dot"></span>
+              </button>
+            </div>`
+          const parentMatches = ql && t.name.toLowerCase().includes(ql)
+          const vSubs = subs.filter(s => !ql || parentMatches || s.name.toLowerCase().includes(ql))
+          const isOpen = !!(exp[t.id] || ql)
+          return html`
+            <div key=${t.id} className="drawer-cat-item">
+              <div className="drawer-cat-row">
+                <button className=${'drawer-cat-btn'+(parentActive?' dc-active':'')} onClick=${()=>pick(t.id,null)}>
+                  ${catImgs[t.id] && html`<img className="dc-thumb" src=${media(catImgs[t.id])} alt=""/>`}
+                  <span className="dc-label">${t.name}</span>
+                </button>
+                <button className=${'dc-expand'+(isOpen?' open':'')} aria-label=${t.name+' ichki bo\'limlari'}
+                  aria-expanded=${isOpen} onClick=${()=>setExp(e=>({...e,[t.id]:!isOpen}))}>
+                  <${IChevronDown} s=${18}/>
+                </button>
+              </div>
+              ${isOpen && html`<${React.Fragment}>
+                <button className=${'dc-sub'+(parentActive?' dc-active':'')} onClick=${()=>pick(t.id,null)}>
+                  <span className="dc-bar"></span><span className="dc-label">Hammasi</span>
+                </button>
+                ${vSubs.map(s => html`
+                  <button key=${s.id} className=${'dc-sub'+(selSub===s.id?' dc-active':'')} onClick=${()=>pick(t.id,s.id)}>
+                    <span className="dc-bar"></span>
+                    ${catImgs[s.id] && html`<img className="dc-thumb" src=${media(catImgs[s.id])} alt=""/>`}
+                    <span className="dc-label">${s.name}</span>
+                  </button>`)}
+              </${React.Fragment}>`}
+            </div>`
+        })}
       </div>
     </div>
   </${React.Fragment}>`
@@ -1384,7 +1668,7 @@ function StepperInput({ value, max, onCommit }) {
 }
 
 // ── ProductItem ────────────────────────────────────────────────────────
-function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail }) {
+function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail, storeCurrency }) {
   const hasVariants = !!(p.has_variants && p.variants?.length)
 
   const _firstAvail = !hasVariants && p.stock_type === 'tracked'
@@ -1412,7 +1696,7 @@ function ProductItem({ p, onAdd, onSetQty, cart, showImages, onDetail }) {
     ? (p.variants[0]?.original_price ?? null)
     : (unit?.original_price ?? null)
   // Valyuta (kiritilgan) + o'sha valyutadagi qiymat
-  const dispCur = hasVariants ? (p.variants[0]?.currency ?? '') : (unit?.currency ?? '')
+  const dispCur = resolveCurrency(hasVariants ? p.variants[0]?.currency : unit?.currency, storeCurrency)
   const dispVal = hasVariants ? (p.variants[0]?.cur_price ?? displayPrice) : (unit?.cur_price ?? displayPrice)
   const dispOrigVal = hasVariants ? (p.variants[0]?.cur_original_price ?? null) : (unit?.cur_original_price ?? null)
 
@@ -1649,6 +1933,16 @@ function Checkout({ open, onClose, total, totalStr, onSubmit, submitting, custom
   const [mapOpen, setMapOpen] = useState(false)
   const [err, setErr] = useState('')
   const courier = delivery === 'courier'
+
+  // Checkout ilova bilan birga mount bo'ladi; mijoz keyin kirsa, ochilish
+  // paytida forma profildagi yangi ism va telefon bilan sinxronlanadi.
+  useEffect(() => {
+    if (!open) return
+    setName(customer?.name || '')
+    setPhone(customer?.phone || '')
+    setErr('')
+  }, [open, customer?.name, customer?.phone])
+
   if (!open) return null
 
   const locateMe = () => {
@@ -1976,17 +2270,81 @@ function CustomerPortal({ open, onClose, customer, onLogout }) {
     </div>`
 }
 
+// ── Banner carousel ─────────────────────────────────────────────────────────
+function BannerCarousel({ banners }) {
+  const [idx, setIdx] = useState(0)
+  const timerRef = useRef(null)
+  const touchStartRef = useRef(null)
+  const n = banners?.length || 0
+
+  const pause = () => clearInterval(timerRef.current)
+  const resume = () => {
+    pause()
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (n > 1 && !reduceMotion) timerRef.current = setInterval(() => setIdx(i => (i + 1) % n), 5500)
+  }
+  const move = d => { setIdx(i => (i + d + n) % n); resume() }
+  const select = i => { setIdx(i); resume() }
+
+  useEffect(() => { setIdx(0); resume(); return pause }, [n])
+
+  if (!n) return null
+  return html`
+    <section className="banner-wrap" aria-label="Do'kon takliflari">
+      <div className="banner-viewport" role="region" aria-roledescription="carousel"
+        onMouseEnter=${pause} onMouseLeave=${resume}
+        onTouchStart=${e=>{touchStartRef.current=e.touches[0]?.clientX ?? null;pause()}}
+        onTouchEnd=${e=>{
+          const start=touchStartRef.current, end=e.changedTouches[0]?.clientX
+          touchStartRef.current=null
+          if(start!=null&&end!=null&&Math.abs(end-start)>42) move(end<start?1:-1); else resume()
+        }}>
+        <div className="banner-track" style=${{transform:`translateX(-${idx*100}%)`}}>
+          ${banners.map((b,i) => {
+            const src = typeof b === 'string' ? b : b.image
+            const title = typeof b === 'string' ? '' : (b.title || '')
+            const subtitle = typeof b === 'string' ? '' : (b.subtitle || '')
+            const imageSrc = src && (src.startsWith('http') || src.startsWith('data:') || src.startsWith('.')) ? src : media(src)
+            return html`<div key=${i} className=${'banner-slide'+(b.copyAlign==='right'?' copy-right':'')} aria-hidden=${i!==idx}>
+              <img src=${imageSrc} alt=${title || 'Kafelbaraka taklifi'} loading=${i===0?'eager':'lazy'}
+                onError=${e=>{e.currentTarget.style.visibility='hidden'}}/>
+              ${(title || subtitle) && html`<div className=${'banner-copy'+(b.copyAlign==='right'?' right':'')}>
+                ${title && html`<div className="banner-title">${title}</div>`}
+                ${subtitle && html`<div className="banner-subtitle">${subtitle}</div>`}
+              </div>`}
+            </div>`
+          })}
+        </div>
+        ${n > 1 && html`<${React.Fragment}>
+          <button className="banner-arrow prev" onClick=${()=>move(-1)} aria-label="Oldingi banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button className="banner-arrow next" onClick=${()=>move(1)} aria-label="Keyingi banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <div className="banner-dots">
+            ${banners.map((_,i) => html`<button key=${i} className=${'banner-dot'+(i===idx?' active':'')}
+              onClick=${()=>select(i)} aria-label=${'Banner '+(i+1)} aria-current=${i===idx?'true':undefined}></button>`)}
+          </div>
+        </${React.Fragment}>`}
+      </div>
+    </section>`
+}
+
 // ── App ─────────────────────────────────────────────────────────────────────
 function App() {
   const [info,      setInfo]     = useState(null)
   const [products,  setProds]    = useState([])
+  const [topIds,    setTopIds]   = useState([])
   const [cats,      setCats]     = useState([])
   const [showImages,setShowImg]  = useState(true)
+  const [catImgs,   setCatImgs]  = useState({})
   const [loading,   setLoad]     = useState(true)
   const [error,     setErr]      = useState('')
 
   const [search,    setSearch]   = useState('')
-  const [selCat,    setSelCat]   = useState(null)
+  const [selTop,    setSelTop]   = useState(null)
+  const [selSub,    setSelSub]   = useState(null)
 
   const [cart,      setCart]     = useState([])
   const [cartOpen,  setCartOpen] = useState(false)
@@ -2001,23 +2359,143 @@ function App() {
   const [drawerOpen,  setDrawer]    = useState(false)
   const [navActive,   setNavActive] = useState('home')
   const [detailProd,  setDetail]    = useState(null)
+  const storeCurrency = normalizeCurrency(info?.currency) || BASE_CUR
 
   const searchRef  = useRef(null)
   const navCartRef = useRef(null)
+  const catSentinelRef = useRef(null)
+  const sectionRefs = useRef({})
+  const chipRefs = useRef({})
+  const pageTitleRef = useRef(null)
 
-  useEffect(() => { api('/storefront/info/').then(setInfo).catch(()=>{}) }, [])
+  const [catStuck, setCatStuck] = useState(false)
+  const [activeCat, setActiveCat] = useState(null)
+  const [scrollToCatId, setScrollToCatId] = useState(null)
+  const [subDropdown, setSubDropdown] = useState(null)
 
   useEffect(() => {
-    setLoad(true)
+    if (!subDropdown) return
+    const close = () => setSubDropdown(null)
+    const onKey = e => { if (e.key === 'Escape') close() }
+    window.addEventListener('scroll', close)
+    window.addEventListener('resize', close)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('scroll', close)
+      window.removeEventListener('resize', close)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [subDropdown])
+
+  const toggleSubDropdown = (catId, chipEl) => {
+    if (!chipEl) return
+    setSubDropdown(sd => {
+      if (sd?.catId === catId) return null
+      const rect = chipEl.getBoundingClientRect()
+      const width = Math.min(300, window.innerWidth - 24)
+      const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))
+      return { catId, top: rect.bottom + 8, left }
+    })
+  }
+
+  const pickSubFromDropdown = (topId, subId) => {
+    setSearch(''); setSelTop(topId); setSelSub(subId); setSubDropdown(null)
+    requestAnimationFrame(() => pageTitleRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }))
+  }
+
+  useEffect(() => {
+    const el = catSentinelRef.current
+    if (!el || !window.IntersectionObserver) return
+    const obs = new IntersectionObserver(([entry]) => setCatStuck(!entry.isIntersecting), {
+      rootMargin:'-64px 0px 0px 0px', threshold:0,
+    })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [cats])
+
+  useEffect(() => {
+    api('/storefront/info/').then(d => {
+      BASE_CUR = normalizeCurrency(d?.currency) || 'UZS'
+      setInfo(d)
+    }).catch(()=>{})
+  }, [])
+
+  useEffect(() => {
+    api('/storefront/top-products/?limit=12').then(r => {
+      const raw = r.product_ids || r.results || []
+      setTopIds(raw.map(x => typeof x === 'object' ? x.id : x).filter(x => x != null))
+    }).catch(() => setTopIds([]))
+  }, [])
+
+  const banners = useMemo(() => {
+    if (!info) return []
+    const rawBanners = Array.isArray(info.banners) ? info.banners : []
+    const fromApi = rawBanners.map(b => {
+      const src = typeof b === 'string' ? b : (b.image_url || b.image || b.url || b.photo || b.file)
+      if (!src) return null
+      const image = src.startsWith('http') || src.startsWith('data:') ? src : media(src)
+      return typeof b === 'string' ? {image} : {
+        image,
+        title: b.title || b.heading || '',
+        subtitle: b.subtitle || b.description || b.caption || '',
+        copyAlign: b.copy_align === 'right' || b.copyAlign === 'right' ? 'right' : 'left',
+      }
+    }).filter(Boolean)
+    return fromApi.length ? fromApi : DEFAULT_BANNERS
+  }, [info])
+
+  useEffect(() => {
+    let active = true
+    setLoad(true); setErr('')
     const q = customer ? '?customer_code='+encodeURIComponent(customer.customer_code) : ''
     api('/storefront/products/'+q).then(r => {
+      if (!active) return
       const list = r.results || []
-      setProds(list)
       setShowImg(r.show_images !== false)
+
+      const imageEntries = Array.isArray(r.category_images)
+        ? r.category_images.map(c => [c.id, c.image || c.image_url]).filter(([,src])=>src)
+        : Object.entries(r.category_images || {}).map(([id,value]) => [
+            id, typeof value === 'string' ? value : (value?.image || value?.image_url),
+          ]).filter(([,src])=>src)
+      const images = Object.fromEntries(imageEntries)
+
       const map = new Map()
-      list.forEach(p => { if (p.category_id && p.category_name && !map.has(p.category_id)) map.set(p.category_id, p.category_name) })
-      setCats([...map.entries()].map(([id,name])=>({id,name})))
-    }).catch(e=>setErr(e.message)).finally(()=>setLoad(false))
+      ;(Array.isArray(r.categories) ? r.categories : []).forEach(c => {
+        if (c.id == null || !c.name) return
+        const parentId = c.parent_id ?? c.parentId ?? c.parent?.id ?? null
+        map.set(c.id, {id:c.id, name:c.name, parentId})
+        const src = c.image || c.image_url
+        if (src) images[c.id] = src
+      })
+      list.forEach(p => {
+        if (p.category_id != null && p.category_name) {
+          map.set(p.category_id, {
+            id:p.category_id, name:p.category_name,
+            parentId:p.category_parent_id ?? map.get(p.category_id)?.parentId ?? null,
+          })
+          if (p.category_image) images[p.category_id] = p.category_image
+        }
+        if (p.category_parent_id != null && p.category_parent_name && !map.has(p.category_parent_id)) {
+          map.set(p.category_parent_id, {
+            id:p.category_parent_id, name:p.category_parent_name, parentId:null,
+          })
+        }
+      })
+      const enrichedList = list.map(p => {
+        const parentId = p.category_parent_id ?? map.get(p.category_id)?.parentId ?? null
+        if (parentId == null || (p.category_parent_id != null && p.category_parent_name)) return p
+        return {
+          ...p,
+          category_parent_id:parentId,
+          category_parent_name:p.category_parent_name || map.get(parentId)?.name || '',
+        }
+      })
+      setProds(enrichedList)
+      setCatImgs(images)
+      setCats([...map.values()])
+    }).catch(e=>{if(active)setErr(e.message)}).finally(()=>{if(active)setLoad(false)})
+    return () => { active = false }
   }, [customer])
 
   useEffect(() => { if (srchOpen && searchRef.current) searchRef.current.focus() }, [srchOpen])
@@ -2025,12 +2503,64 @@ function App() {
   const doLogin = c => { setCust(c); localStorage.setItem('sf_cust',JSON.stringify(c)); setLoginOpen(false) }
   const logout  = () => { setCust(null); localStorage.removeItem('sf_cust') }
 
+  const topProducts = useMemo(() => {
+    if (!topIds.length || !products.length) return []
+    const byId = new Map(products.map(p => [String(p.id), p]))
+    return topIds.map(id => byId.get(String(id))).filter(Boolean).filter(p => !isOutOfStock(p))
+  }, [topIds, products])
+
+  const topCats = useMemo(() => cats.filter(c => c.parentId == null), [cats])
+  const subCats = useMemo(() => selTop == null ? [] : cats.filter(c => c.parentId === selTop), [cats, selTop])
+  const categoryParents = useMemo(() => new Map(cats.map(c => [c.id, c.parentId])), [cats])
+
   const filtered = useMemo(() => {
     let l = products
-    if (selCat)  l = l.filter(p => p.category_id === selCat)
-    if (search)  l = l.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
+    if (selSub != null) l = l.filter(p => p.category_id === selSub)
+    else if (selTop != null) l = l.filter(p =>
+      p.category_id === selTop || p.category_parent_id === selTop || categoryParents.get(p.category_id) === selTop)
+    if (search) l = l.filter(p => (p.name || '').toLowerCase().includes(search.toLowerCase().trim()))
     return l
-  }, [products, selCat, search])
+  }, [products, selTop, selSub, search, categoryParents])
+
+  const searchFallback = useMemo(() => {
+    if (!search.trim() || filtered.length > 0) return []
+    return searchSuggestions(search, products, 8)
+  }, [search, filtered, products])
+
+  const groupedSections = useMemo(() => {
+    if (selTop != null || selSub != null || search || topCats.length === 0) return null
+    const byCat = new Map(topCats.map(c => [c.id, []]))
+    filtered.forEach(p => {
+      const topId = p.category_parent_id ?? categoryParents.get(p.category_id) ?? p.category_id
+      if (byCat.has(topId)) byCat.get(topId).push(p)
+    })
+    const groups = topCats.map(cat => ({cat, items:byCat.get(cat.id) || []})).filter(group => group.items.length)
+    return groups.length ? groups : null
+  }, [filtered, topCats, selTop, selSub, search, categoryParents])
+
+  useEffect(() => {
+    if (!groupedSections?.length || !window.IntersectionObserver) return
+    const els = groupedSections.map(g => sectionRefs.current[g.cat.id]).filter(Boolean)
+    if (!els.length) return
+    const obs = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting).sort((a,b) => a.boundingClientRect.top-b.boundingClientRect.top)
+      if (visible[0]) setActiveCat(visible[0].target.dataset.catId)
+    }, {rootMargin:'-160px 0px -68% 0px', threshold:0})
+    els.forEach(el => obs.observe(el))
+    return () => obs.disconnect()
+  }, [groupedSections])
+
+  useEffect(() => {
+    if (scrollToCatId == null) return
+    const el = sectionRefs.current[scrollToCatId]
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'})
+    setScrollToCatId(null)
+  }, [scrollToCatId, groupedSections])
+
+  const goToCat = id => {
+    setSearch(''); setSelTop(null); setSelSub(null); setSubDropdown(null)
+    setActiveCat(String(id)); setScrollToCatId(id); setNavActive('home')
+  }
 
   const total = cart.reduce((s,it)=>s+it.price*it.qty, 0)
   const count = cart.reduce((s,it)=>s+it.qty, 0)
@@ -2058,7 +2588,7 @@ function App() {
     setCart(c => {
       const ex = c.find(x=>x.key===key)
       if (ex) { if(ex.qty>=max) return c; return c.map(x=>x.key===key?{...x,qty:Math.min(x.qty+qty,max)}:x) }
-      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',weight,name:p.name,price:unit?.price,currency:unit?.currency||'',cur_price:unit?.cur_price ?? unit?.price,qty:Math.min(qty,max),maxQty:max,image:p.image}]
+      return [...c, {key,product_id:p.id,unit_id:unit?.unit_id,variant_id:null,variant_name:'',unit_name:unit?.unit_name||'dona',weight,name:p.name,price:unit?.price,currency:resolveCurrency(unit?.currency,storeCurrency),cur_price:unit?.cur_price ?? unit?.price,qty:Math.min(qty,max),maxQty:max,image:p.image}]
     })
     _orbBounce(fromEl)
   }
@@ -2070,7 +2600,7 @@ function App() {
     setCart(c => {
       const ex = c.find(x=>x.key===key)
       if (ex) return c.map(x=>x.key===key?{...x,qty:Math.min(x.qty+qty,max)}:x)
-      return [...c, {key,product_id:p.id,unit_id:null,variant_id:variant.id,variant_name:variant.name,unit_name:'dona',name:p.name,price:variant.price,currency:variant.currency||'',cur_price:variant.cur_price ?? variant.price,qty,maxQty:max===Infinity?9999:max,image:p.image}]
+      return [...c, {key,product_id:p.id,unit_id:null,variant_id:variant.id,variant_name:variant.name,unit_name:'dona',name:p.name,price:variant.price,currency:resolveCurrency(variant.currency,storeCurrency),cur_price:variant.cur_price ?? variant.price,qty,maxQty:max===Infinity?9999:max,image:p.image}]
     })
     _orbBounce(fromEl)
   }
@@ -2096,7 +2626,8 @@ function App() {
     } catch(e) { alert(e.message) } finally { setSubbing(false) }
   }
 
-  const catName = selCat ? cats.find(c=>c.id===selCat)?.name : null
+  const selectedCatId = selSub ?? selTop
+  const catName = selectedCatId != null ? cats.find(c=>c.id===selectedCatId)?.name : null
 
   return html`<div>
 
@@ -2140,15 +2671,55 @@ function App() {
       </div>
     </header>
 
-    <!-- ── Category bar ────────────────────────────────────── -->
-    ${cats.length > 0 && html`
-      <nav className="cat-bar">
+    <!-- ── API bannerlar; info kelmaguncha komponent bo'sh ── -->
+    <${BannerCarousel} banners=${banners}/>
+
+    <!-- ── Parent categories + subcategory controls ───────── -->
+    <div className="cat-sentinel" ref=${catSentinelRef}></div>
+    ${topCats.length > 0 && html`
+      <nav className=${'cat-bar'+(catStuck?' cat-bar-stuck':'')} aria-label="Mahsulot bo'limlari">
         <div className="cat-bar-inner">
-          <button className=${'cat-chip'+(selCat===null?' active':'')} onClick=${()=>setSelCat(null)}>
-            Barchasi
-          </button>
-          ${cats.map(c => html`
-            <button key=${c.id} className=${'cat-chip'+(selCat===c.id?' active':'')} onClick=${()=>setSelCat(c.id)}>
+          <div className=${'cat-chip-wrap no-children'+(selTop==null&&activeCat==null?' active':'')}>
+            <button className="cat-chip" onClick=${()=>{
+              setSearch('');setSelTop(null);setSelSub(null);setActiveCat(null);setSubDropdown(null);setNavActive('home')
+              pageTitleRef.current?.scrollIntoView({behavior:'smooth',block:'start'})
+            }}>Barchasi</button>
+          </div>
+          ${topCats.map(c => {
+            const children = cats.filter(sc => sc.parentId === c.id)
+            const active = selTop===c.id || (selTop==null && activeCat===String(c.id)) || subDropdown?.catId===c.id
+            return html`<div key=${c.id} className=${'cat-chip-wrap'+(children.length?'':' no-children')+(active?' active':'')}>
+              <button className="cat-chip" ref=${el=>{if(el)chipRefs.current[c.id]=el}} onClick=${()=>goToCat(c.id)}>
+                ${catImgs[c.id] && html`<img className="cat-chip-thumb" src=${media(catImgs[c.id])} alt=""/>`}
+                ${c.name}
+              </button>
+              ${children.length>0 && html`<button className=${'cat-chip-arrow-btn'+(subDropdown?.catId===c.id?' open':'')}
+                onClick=${()=>toggleSubDropdown(c.id,chipRefs.current[c.id])}
+                aria-label=${c.name+' ichki bo\'limlari'} aria-expanded=${subDropdown?.catId===c.id}>
+                <${IChevronDown} s=${13}/>
+              </button>`}
+            </div>`
+          })}
+        </div>
+      </nav>`}
+
+    ${subDropdown && html`<${React.Fragment}>
+      <div className="cat-subdrop-overlay" onClick=${()=>setSubDropdown(null)}></div>
+      <div className="cat-subdrop" style=${{top:subDropdown.top+'px',left:subDropdown.left+'px'}}>
+        ${cats.filter(sc=>sc.parentId===subDropdown.catId).map(sub => html`
+          <button key=${sub.id} className="cat-subdrop-item" onClick=${()=>pickSubFromDropdown(subDropdown.catId,sub.id)}>
+            ${catImgs[sub.id] && html`<img className="cat-subdrop-thumb" src=${media(catImgs[sub.id])} alt=""/>`}
+            <span>${sub.name}</span>
+          </button>`)}
+      </div>
+    </${React.Fragment}>`}
+
+    ${subCats.length > 0 && html`
+      <nav className="cat-bar cat-bar-sub" aria-label="Ichki bo'limlar">
+        <div className="cat-bar-inner">
+          <button className=${'cat-chip cat-chip-sub'+(selSub==null?' active':'')} onClick=${()=>setSelSub(null)}>Barchasi</button>
+          ${subCats.map(c => html`
+            <button key=${c.id} className=${'cat-chip cat-chip-sub'+(selSub===c.id?' active':'')} onClick=${()=>setSelSub(c.id)}>
               ${c.name}
             </button>`)}
         </div>
@@ -2156,10 +2727,29 @@ function App() {
 
     <!-- ── Page body ───────────────────────────────────────── -->
     <main className="page-body">
-      <h1 className="page-title">
+      <h1 className="page-title" ref=${pageTitleRef}>
         ${catName || 'Katalog'}
         ${!loading && html`<span>${filtered.length} ta mahsulot</span>`}
       </h1>
+
+      ${!loading && !error && !search && selTop==null && selSub==null && topProducts.length>0 && html`
+        <section className="top-rail-wrap" aria-labelledby="top-products-title">
+          <div className="top-rail-head">
+            <h2 id="top-products-title">Top mahsulotlar</h2>
+            <span className="top-rail-badge">Eng ko'p sotilgan</span>
+          </div>
+          <div className="top-rail">
+            ${topProducts.map(p => html`
+              <div className="top-rail-item" key=${p.id}>
+                <div className="top-rail-rank">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  TOP
+                </div>
+                <${ProductItem} p=${p} onAdd=${addToCart} onSetQty=${updQty} cart=${cart}
+                  showImages=${showImages} onDetail=${setDetail} storeCurrency=${storeCurrency}/>
+              </div>`)}
+          </div>
+        </section>`}
 
       <!-- States -->
       ${loading && html`<${Skeleton}/>`}
@@ -2167,17 +2757,43 @@ function App() {
         <div className="state-emoji">😕</div>
         <div className="state-text">Xatolik yuz berdi: ${error}</div>
       </div></div>`}
-      ${!loading && !error && filtered.length===0 && html`<div className="product-grid"><div className="state-center">
+      ${!loading && !error && filtered.length===0 && searchFallback.length===0 && html`<div className="product-grid"><div className="state-center">
         <div className="state-emoji">🔍</div>
         <div className="state-text">Mahsulot topilmadi</div>
       </div></div>`}
+      ${!loading && !error && filtered.length===0 && searchFallback.length>0 && html`
+        <div>
+          <div className="state-center" style=${{padding:'56px 20px 8px'}}>
+            <div className="state-emoji">🔍</div>
+            <div className="state-text">"${search}" bo'yicha aniq mos kelmadi</div>
+          </div>
+          <div className="fallback-label">Shunga o'xshash mahsulotlar</div>
+          <div className="product-grid">
+            ${searchFallback.map(p => html`
+              <${ProductItem} key=${p.id} p=${p} onAdd=${addToCart} onSetQty=${updQty} cart=${cart}
+                showImages=${showImages} onDetail=${setDetail} storeCurrency=${storeCurrency}/>`)}
+          </div>
+        </div>`}
 
-      <!-- Grid -->
-      ${!loading && !error && filtered.length>0 && html`
+      <!-- Category-grouped homepage -->
+      ${!loading && !error && filtered.length>0 && groupedSections && html`
+        <div className="cat-sections">
+          ${groupedSections.map(group => html`
+            <section key=${group.cat.id} id=${'cat-sec-'+group.cat.id} data-cat-id=${group.cat.id} className="cat-section"
+              ref=${el=>{if(el)sectionRefs.current[group.cat.id]=el}}>
+              <h2 className="cat-section-title">${group.cat.name}</h2>
+              <div className="product-grid">
+                ${group.items.map(p => html`
+                  <${ProductItem} key=${p.id} p=${p} onAdd=${addToCart} onSetQty=${updQty} cart=${cart}
+                    showImages=${showImages} onDetail=${setDetail} storeCurrency=${storeCurrency}/>`)}
+              </div>
+            </section>`)}
+        </div>`}
+      ${!loading && !error && filtered.length>0 && !groupedSections && html`
         <div className="product-grid">
           ${filtered.map(p => html`
             <${ProductItem} key=${p.id} p=${p} onAdd=${addToCart} onSetQty=${updQty} cart=${cart} showImages=${showImages}
-              onDetail=${setDetail}/>`)}
+              onDetail=${setDetail} storeCurrency=${storeCurrency}/>`)}
         </div>`}
     </main>
 
@@ -2200,25 +2816,33 @@ function App() {
     ${done && html`<${Success} order=${done} onClose=${()=>setDone(null)}/>`}
 
     <!-- ── Product Detail ───────────────────── -->
-    ${detailProd && html`<${ProductDetail}
+    ${detailProd && html`<${ProductDetail} key=${detailProd.id}
       product=${detailProd}
       onClose=${()=>setDetail(null)}
       onAdd=${addToCart}
       onAddVariant=${addVariantToCart}
-      cart=${cart}/>`}
+      cart=${cart}
+      allProducts=${products}
+      onSetQty=${updQty}
+      showImages=${showImages}
+      onSelect=${setDetail}
+      storeCurrency=${storeCurrency}/>`}
 
     <!-- ── Category Drawer ───────────────────── -->
     <${CategoryDrawer}
       open=${drawerOpen} onClose=${()=>setDrawer(false)}
-      cats=${cats} selCat=${selCat}
-      onSelect=${id=>{setSelCat(id);setNavActive('home')}}/>
+      cats=${cats} selTop=${selTop} selSub=${selSub} catImgs=${catImgs}
+      onSelect=${(top,sub)=>{
+        setSearch('');setSelTop(top);setSelSub(sub);setActiveCat(null);setNavActive('home')
+        requestAnimationFrame(()=>pageTitleRef.current?.scrollIntoView({behavior:'smooth',block:'start'}))
+      }}/>
 
     <!-- ── Bottom Nav ────────────────────────── -->
     <${BottomNav}
       active=${navActive}
       count=${count}
       cartIconRef=${navCartRef}
-      onHome=${()=>{setSelCat(null);setSearch('');setSrchOpen(false);setNavActive('home');window.scrollTo({top:0,behavior:'smooth'})}}
+      onHome=${()=>{setSelTop(null);setSelSub(null);setActiveCat(null);setSearch('');setSrchOpen(false);setNavActive('home');window.scrollTo({top:0,behavior:'smooth'})}}
       onSearch=${()=>{setSrchOpen(s=>!s);setNavActive('search')}}
       onCart=${()=>{setCartOpen(true);setNavActive('cart');setTimeout(()=>setNavActive('home'),300)}}
       onDrawer=${()=>{setDrawer(d=>!d);setNavActive('catalog')}}/>
@@ -2227,7 +2851,7 @@ function App() {
 
 // Mobile search button — hide on desktop, show on mobile
 const style = document.createElement('style')
-style.textContent = '.mobile-search-trigger{display:none!important}@media(max-width:640px){.mobile-search-trigger{display:flex!important}.header-search{display:none!important}}'
+style.textContent = '.mobile-search-trigger{display:none!important}@media(max-width:640px){.mobile-search-trigger{display:flex!important}.header-search:not(.fade-in){display:none!important}.header-search.fade-in{display:flex!important}}'
 document.head.appendChild(style)
 
 createRoot(document.getElementById('root')).render(html`<${App}/>`)

@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kafel-baraka",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    // Also the code's default.
+    "DUKONLINE_API_URL": "https://api.dukonline.uz/api",
+    // The public address; build with the same value (robots.txt is
+    // prerendered): SITE_URL=... npm run cf:deploy
+    "SITE_URL": "https://kafelbaraka.uz"
+  },
+  // For the last good ERP responses shared by every instance of the Worker
+  // (see src/lib/storefront/shared-cache.ts), create a KV namespace of this
+  // shop's own (never another shop's: the keys carry no tenant) and bind it:
+  // "kv_namespaces": [{ "binding": "STOREFRONT_CACHE", "id": "<namespace id>" }],
+  "observability": { "enabled": true }
+}

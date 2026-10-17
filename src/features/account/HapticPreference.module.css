@@ -1,0 +1,15 @@
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-brand);
+}

@@ -1,0 +1,97 @@
+.nav {
+  display: none;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inner {
+  position: relative;
+}
+
+/* Faded edges hint that the row scrolls. */
+.inner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: var(--gutter);
+  bottom: 0;
+  width: 48px;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0%), rgb(255 255 255 / 96%));
+  pointer-events: none;
+}
+
+.list {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: var(--space-2) 48px var(--space-2) 0;
+}
+
+.list > li {
+  flex-shrink: 0;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+  transition:
+    background var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+
+.link svg {
+  color: var(--color-muted);
+  transition: color var(--duration) var(--ease);
+}
+
+.link:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-ink);
+}
+
+.link:hover svg,
+.link[aria-current="page"] svg {
+  color: var(--color-brand);
+}
+
+.link[aria-current="page"] {
+  background: var(--color-brand-soft);
+  color: var(--color-brand-ink);
+}
+
+/* A thin rule between the makers and the sizes. */
+.group {
+  position: relative;
+  margin-left: var(--space-2);
+  padding-left: var(--space-2);
+}
+
+.group::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 1px;
+  background: var(--color-border-strong);
+}
+
+@media (min-width: 1024px) {
+  .nav {
+    display: block;
+  }
+}

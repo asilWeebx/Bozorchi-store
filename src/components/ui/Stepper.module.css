@@ -1,0 +1,85 @@
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.md {
+  height: 50px;
+  min-width: 160px;
+}
+
+.sm {
+  height: 38px;
+  min-width: 120px;
+}
+
+.button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 100%;
+  border-radius: var(--radius-md);
+  color: var(--color-brand);
+  transition: background var(--duration) var(--ease);
+}
+
+.button:hover:not(:disabled) {
+  background: rgb(135 103 63 / 12%);
+}
+
+.sm .button {
+  width: 38px;
+}
+
+.button:disabled {
+  color: var(--color-faint);
+  cursor: not-allowed;
+}
+
+.field {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+  min-width: 56px;
+  padding-inline: var(--space-1);
+}
+
+.input {
+  flex-shrink: 0;
+  width: auto;
+  min-width: 2ch;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-heavy);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.sm .input {
+  font-size: var(--text-md);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.field:focus-within {
+  border-radius: var(--radius-xs);
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.suffix {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-muted);
+}

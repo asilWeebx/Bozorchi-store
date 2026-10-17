@@ -1,0 +1,98 @@
+.section {
+  padding-top: var(--space-12);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-dark);
+  color: var(--color-on-dark);
+}
+
+.copy > div {
+  margin-bottom: var(--space-3);
+}
+
+.points {
+  display: grid;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-on-dark-muted);
+}
+
+.points li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+/* A small tile on its point, like the logo's. */
+.points li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.45em;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--color-gold-light);
+  transform: rotate(45deg);
+}
+
+.points strong {
+  font-weight: var(--weight-semibold);
+  color: var(--color-on-dark);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-dark-line);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table thead th {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-accent-on-dark);
+  border-bottom: 1px solid var(--color-dark-line);
+}
+
+.table tbody tr + tr {
+  border-top: 1px solid var(--color-dark-line);
+}
+
+.table tbody th {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0;
+}
+
+.table td {
+  color: var(--color-on-dark-muted);
+}
+
+@media (min-width: 960px) {
+  .panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: var(--space-10);
+    padding: var(--space-10);
+  }
+}

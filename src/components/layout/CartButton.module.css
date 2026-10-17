@@ -1,0 +1,22 @@
+.icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.badge {
+  position: absolute;
+  top: -7px;
+  right: -10px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border: 2px solid var(--badge-ring, var(--color-surface));
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 10px;
+  font-weight: var(--weight-black);
+  line-height: 15px;
+  text-align: center;
+}

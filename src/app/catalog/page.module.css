@@ -1,0 +1,102 @@
+.page {
+  padding-bottom: var(--space-8);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  /* Titles here are often sizes ("60×120"), whose digits Marcellus draws like letters. */
+  font-family: var(--font-sans);
+  font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.25rem);
+  font-weight: var(--weight-medium);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.note {
+  flex-basis: 100%;
+  margin-top: -2px;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.count {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.layout {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.aside {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sortMobile {
+  display: block;
+}
+
+.results {
+  min-width: 0;
+}
+
+.toolbar {
+  display: none;
+}
+
+.clearQuery {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-brand-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.suggestions {
+  margin-top: var(--space-8);
+}
+
+.suggestionsTitle {
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-heavy);
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+  .aside {
+    position: sticky;
+    top: calc(var(--header-height) + 54px + var(--space-4));
+    display: block;
+    max-height: calc(100dvh - var(--header-height) - 54px - var(--space-8));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding-right: var(--space-2);
+  }
+  .sortMobile {
+    display: none;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+  }
+}

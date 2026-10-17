@@ -1,0 +1,6 @@
+/* The height comes from the `height` prop (or a caller's class); the width follows the artwork. */
+.logo {
+  display: block;
+  flex-shrink: 0;
+  width: auto;
+}

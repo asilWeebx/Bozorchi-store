@@ -1,0 +1,15 @@
+.quick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.details {
+  align-self: center;
+  font-weight: var(--weight-bold);
+  color: var(--color-brand-ink);
+}
+
+.details:hover {
+  text-decoration: underline;
+}

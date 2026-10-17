@@ -1,0 +1,14 @@
+.page {
+  padding-bottom: var(--space-8);
+}
+
+.similar {
+  margin-top: var(--space-12);
+}
+
+.similarTitle {
+  margin-bottom: var(--space-5);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-heavy);
+}

@@ -1,0 +1,184 @@
+.carousel {
+  position: relative;
+  margin-top: var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-dark);
+  color: var(--color-on-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+}
+
+.picture {
+  position: relative;
+  aspect-ratio: 2.7;
+}
+
+/* Phones: the photo above, cropped to its subject, the words under it on the dark. */
+.withCopy .picture {
+  aspect-ratio: 1.6;
+}
+
+.withCopy .image {
+  object-position: var(--focus, 50% 50%);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5) calc(var(--space-6) + 30px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-accent-on-dark);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+}
+
+.title {
+  max-width: 17ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 4.6cqi, 3rem);
+  font-weight: var(--weight-regular);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: var(--color-on-dark);
+}
+
+.text {
+  max-width: 36ch;
+  font-size: var(--text-sm);
+  color: var(--color-on-dark-muted);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 46px;
+  margin-top: var(--space-3);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-sm);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-weight: var(--weight-semibold);
+  transition: background var(--duration) var(--ease);
+}
+
+.cta:hover {
+  background: var(--color-brand-hover);
+}
+
+.controls {
+  position: absolute;
+  left: var(--space-5);
+  bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 14%);
+  color: var(--color-on-dark);
+  backdrop-filter: blur(6px);
+}
+
+.arrow:hover {
+  background: rgb(255 255 255 / 24%);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 35%);
+  transition:
+    width var(--duration) var(--ease),
+    background var(--duration) var(--ease);
+}
+
+.dot[aria-current="true"] {
+  width: 24px;
+  background: var(--color-gold-light);
+}
+
+/* Wider screens: the photo fills the slide and the words sit on its quiet side, over a soft shade. */
+@media (min-width: 768px) {
+  .slide {
+    display: block;
+    height: clamp(360px, 36vw, 460px);
+  }
+  .picture,
+  .withCopy .picture {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+  }
+  .withCopy .image {
+    object-position: 50% 50%;
+  }
+  .copy {
+    position: relative;
+    justify-content: center;
+    width: min(56%, 560px);
+    height: 100%;
+    padding: var(--space-6) var(--space-4) var(--space-16) var(--space-10);
+    background: linear-gradient(90deg, rgb(21 19 17 / 78%) 45%, rgb(21 19 17 / 0%));
+  }
+  .right .copy {
+    margin-left: auto;
+    align-items: flex-end;
+    padding: var(--space-6) var(--space-10) var(--space-16) var(--space-4);
+    text-align: right;
+    background: linear-gradient(270deg, rgb(21 19 17 / 78%) 45%, rgb(21 19 17 / 0%));
+  }
+  .right .eyebrow {
+    flex-direction: row-reverse;
+  }
+  .text {
+    font-size: var(--text-md);
+  }
+  .controls {
+    left: var(--space-10);
+    bottom: var(--space-5);
+  }
+}

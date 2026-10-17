@@ -1,0 +1,66 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1240px) {
+  .grid:not(.narrow) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* One swipeable row on every screen: a home-page shelf or "similar products". */
+.rail {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 46%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin-inline: calc(var(--gutter) * -1);
+  padding: var(--space-1) var(--gutter) var(--space-4);
+  scroll-padding-inline: var(--gutter);
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.rail > li {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 640px) {
+  .rail {
+    grid-template-columns: none;
+    grid-auto-columns: calc((100% - 2 * var(--gutter) - 2 * var(--space-4)) / 3.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .rail {
+    grid-template-columns: none;
+    grid-auto-columns: calc((100% - 2 * var(--gutter) - 3 * var(--space-4)) / 4.2);
+  }
+}
+
+@media (min-width: 1240px) {
+  .rail:not(.narrow) {
+    grid-template-columns: none;
+    grid-auto-columns: calc((100% - 2 * var(--gutter) - 4 * var(--space-4)) / 5);
+  }
+}

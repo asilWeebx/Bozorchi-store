@@ -1,0 +1,219 @@
+.form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 640px;
+}
+
+.icon {
+  position: absolute;
+  left: var(--space-4);
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  height: 46px;
+  padding: 0 var(--space-10) 0 calc(var(--space-4) + 28px);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  font-size: var(--text-sm);
+  transition:
+    border-color var(--duration) var(--ease),
+    background var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 4px var(--color-brand-soft);
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.clear {
+  position: absolute;
+  right: var(--space-2);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--color-muted);
+}
+
+.clear:hover {
+  background: var(--color-surface-sunken);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.note {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.result:hover,
+.result:focus-visible {
+  background: var(--color-bg);
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-tile);
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.resultText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.resultName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resultMeta {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-heavy);
+  color: var(--color-ink-soft);
+}
+
+.all {
+  width: 100%;
+  margin-top: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-heavy);
+  color: var(--color-brand-ink);
+}
+
+.all:hover {
+  background: var(--color-brand-soft);
+}
+
+.popular {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+}
+
+.chip {
+  min-height: 38px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.chip:hover {
+  color: var(--color-brand);
+}
+
+.expanded {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  max-width: none;
+  margin-bottom: var(--space-3);
+}
+
+.expanded .icon {
+  top: 14px;
+}
+
+.expanded .clear {
+  top: 7px;
+}
+
+.expanded .panel {
+  position: relative;
+  top: auto;
+  width: 100%;
+  margin-top: var(--space-3);
+  max-height: none;
+  box-shadow: none;
+}
+
+.compact {
+  max-width: none;
+  min-width: 0;
+}
+
+.compact .input {
+  height: 40px;
+  padding-right: var(--space-8);
+  padding-left: 36px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+}
+
+.compact .icon {
+  left: var(--space-3);
+  width: 17px;
+  height: 17px;
+}
+
+.compact .clear {
+  right: 2px;
+  width: 30px;
+  height: 30px;
+}
+
+/* Keep mobile results usable even though the field itself is intentionally narrow. */
+.compact .panel {
+  right: calc(-44px - var(--space-2));
+  left: auto;
+  width: calc(100vw - (var(--gutter) * 2));
+}

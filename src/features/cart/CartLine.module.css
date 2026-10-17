@@ -1,0 +1,143 @@
+.line {
+  container-type: inline-size;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-areas:
+    "media info"
+    "controls controls"
+    "cap cap";
+  gap: var(--space-3);
+}
+
+.media {
+  grid-area: media;
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  background: var(--color-tile);
+  overflow: hidden;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.info {
+  grid-area: info;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.name:hover {
+  color: var(--color-brand);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-muted);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-soft);
+}
+
+.unit {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+.controls {
+  grid-area: controls;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto;
+  line-height: 1.2;
+}
+
+.total {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pack {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--color-muted);
+}
+
+.remove:hover {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.cap {
+  grid-area: cap;
+  font-size: var(--text-xs);
+  color: var(--color-warning);
+}
+
+/* Sized by the line's own width, so the narrow cart drawer keeps the stacked layout on wide screens. */
+@container (min-width: 560px) {
+  .body {
+    grid-template-columns: 80px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "media info controls"
+      "media cap cap";
+    align-items: center;
+  }
+  .media {
+    width: 80px;
+    height: 80px;
+  }
+}

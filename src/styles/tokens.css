@@ -1,0 +1,135 @@
+/*
+ * Design tokens: the only place colours, type, spacing, radii and shadows are
+ * defined. Components read them through their own CSS Modules.
+ *
+ * Palette: the Kafel Baraka logo. Its bronze K (#a2815c) and frame, the
+ * silver-white "KAFEL" lettering and the black and white marble tiles, set
+ * on a warm near-black, as the logo itself is. Pages are warm marble white;
+ * the header and footer are the logo's dark, so the logo is used as it was
+ * drawn. White on the logo's bronze is 3.6:1, too faint for text, so what you
+ * press uses a deeper bronze (`--color-brand`, white on it 5.1:1) and the
+ * logo bronze (`--color-gold`) is for lines, marks and large type on dark.
+ */
+:root {
+  /* Surfaces: warm marble */
+  --color-bg: #f6f3ee;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1ece4;
+  --color-surface-sunken: #e8e1d6;
+  --color-tile: #ece6dc;
+
+  /* Text: warm black */
+  --color-ink: #1c1915;
+  --color-ink-soft: #3a342c;
+  --color-muted: #6c6459;
+  --color-faint: #9a9185;
+
+  /* Lines */
+  --color-border: #e6dfd4;
+  --color-border-strong: #d2c7b7;
+
+  /* Action: deep bronze, legible under white text */
+  --color-brand: #87673f;
+  --color-brand-hover: #6f5332;
+  --color-brand-soft: #f3ebdf;
+  --color-brand-ink: #7a5c37;
+  --color-on-brand: #ffffff;
+
+  /* The logo's bronze itself: lines, marks, type on dark */
+  --color-gold: #a2815c;
+  --color-gold-light: #c9a97f;
+  --color-gold-soft: #efe4d4;
+
+  /* Highlight: polished bronze for badges and the cart dot */
+  --color-accent: #c9a97f;
+  --color-accent-hover: #b8956a;
+  --color-accent-soft: #f6eddf;
+  --color-accent-ink: #6f5332;
+  --color-on-accent: #1c1915;
+
+  /* Deep bands (header, footer): the logo's background */
+  --color-dark: #151311;
+  --color-dark-raised: #221f1b;
+  --color-dark-line: #39342d;
+  --color-on-dark: #f2eee8;
+  --color-on-dark-muted: #b9b0a3;
+  --color-accent-on-dark: #d8bb92;
+
+  /* States */
+  --color-success: #2f7a4d;
+  --color-success-soft: #e2f1e7;
+  --color-danger: #b6402f;
+  --color-danger-soft: #f8e6e2;
+  --color-warning: #8a5a12;
+  --color-warning-soft: #f8ecd6;
+
+  /*
+   * Type: Marcellus, a classical Roman capital like the logo's "KAFEL", for
+   * headings; Jost, geometric like its "BARAKA", for everything else.
+   */
+  --font-display: var(--font-marcellus), "Times New Roman", serif;
+  --font-sans: var(--font-jost), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: 1.625rem;
+  --text-3xl: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
+  --text-display: clamp(2rem, 1.2rem + 3vw, 3.5rem);
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 700;
+  --weight-black: 800;
+  --tracking-caps: 0.12em;
+
+  /* Spacing (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Shape: crisp, like cut stone; only pills are round */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 999px;
+
+  /* Depth: warm, low shadows */
+  --shadow-sm: 0 1px 2px rgb(28 25 21 / 6%), 0 1px 1px rgb(28 25 21 / 4%);
+  --shadow-md: 0 12px 28px rgb(28 25 21 / 10%);
+  --shadow-lg: 0 24px 60px rgb(28 25 21 / 24%);
+  --shadow-brand: 0 8px 20px rgb(135 103 63 / 28%);
+
+  /* Grout: the thin line between tiles, used in the tile drawings */
+  --color-grout: #d8d0c3;
+
+  /* Layout */
+  --container: 1280px;
+  --gutter: clamp(16px, 3vw, 32px);
+  --header-height: 72px;
+  --mobile-nav-height: 64px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --duration: 160ms;
+
+  /* Stacking */
+  --z-header: 50;
+  --z-mobile-nav: 60;
+  --z-dropdown: 70;
+  --z-dialog: 100;
+}

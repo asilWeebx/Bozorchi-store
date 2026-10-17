@@ -1,0 +1,12 @@
+.image {
+  object-fit: cover;
+}
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-faint);
+  background: var(--color-surface-muted);
+}

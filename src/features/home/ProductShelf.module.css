@@ -1,0 +1,27 @@
+.section {
+  padding-top: var(--space-10);
+}
+
+.band {
+  position: relative;
+  isolation: isolate;
+  margin-top: var(--space-10);
+  padding: var(--space-8) 0 var(--space-4);
+  background: var(--color-dark);
+}
+
+/* Large tiles in a running bond, as faint bronze grout lines. */
+.band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgb(162 129 92 / 12%) 1px, transparent 1px) 0 0 / 100% 120px,
+    linear-gradient(90deg, rgb(162 129 92 / 12%) 1px, transparent 1px) 0 0 / 240px 240px,
+    linear-gradient(90deg, rgb(162 129 92 / 12%) 1px, transparent 1px) 120px 120px / 240px 240px;
+}
+
+.inner {
+  min-width: 0;
+}

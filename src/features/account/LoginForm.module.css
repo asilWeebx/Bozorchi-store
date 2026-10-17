@@ -1,0 +1,69 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 440px;
+  margin: var(--space-6) auto 0;
+  padding: var(--space-8) var(--space-6);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+}
+
+.text {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.field {
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--space-4);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px var(--color-brand-soft);
+}
+
+.error {
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
